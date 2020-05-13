@@ -39,7 +39,7 @@ class Stack {
 	//Not a part of Stack ADT but using here for better understanding.
 	void display() {
 		cout<<"Stack : [";
-		for(int i=0;i<=top;i++) {
+		for(int i=top;i>=0;i--) {
 			cout<<A[i]<<",";
 		}
 		cout<<"]"<<endl;
@@ -199,10 +199,118 @@ void reverse_string(string str) {
 	cout<<str<<endl;
 }
 
-int main() {
-	int A[]={1,2,3,4,5,6};
-	int n=sizeof(A)/sizeof(int);
+//Two stacks using a single array is skipped cause its easy enough and just time consuming to implement.
+
+bool check_brackets_balanced(const string exp) {
+	int n=exp.size();
+	Stack<char> s(n);
+	for(int i=0;i<n;i++) {
+		char x=exp[i];
+		if(x=='(' || x=='[' || x=='{') {
+			s.push(x);
+		}
+		else {
+			if(s.isEmpty()) {
+				return false;
+			}
+			if(x==')') {
+				if(s.pop()!='(')
+					return false;
+			}
+			else if(x==']') {
+				if(s.pop()!='[')
+					return false;
+			}
+			else {
+				if(s.pop()!='{')
+					return false;
+			}
+		}
+	}
+	if(!s.isEmpty())
+		return false;
+	return true;
+}
+
+void misordered_print_next_greater_element(const int A[],int n) {  //Checking if current element is greater than any previous element.	LEFT->RIGHT
 	Stack<int> s(n);
+	s.push(A[0]);
+	for(int i=1;i<n;i++) {
+		while(!s.isEmpty() && A[i]>=s.peek()) {
+			cout<<"Next greater element of "<<s.pop()<<" is :"<<A[i]<<endl;
+		}
+		s.push(A[i]);
+	}
+	while(!s.isEmpty()) {
+		cout<<"Next greater element of "<<s.pop()<<" is :"<<"-1"<<endl;
+	}
+}
+
+void reverseordered_print_next_greater_element(const int A[],int n) {		//Checking if current element has a greater element in stack.	RIGHT->LEFT
+	Stack<int> s(n);
+	for(int i=n-1;i>=0;i--) {
+		while(!s.isEmpty() && s.peek()<A[i]) {
+			s.pop();
+		}
+		if(s.isEmpty()) {
+			cout<<"Next greater element of "<<A[i]<<" is :"<<-1<<endl;
+		}
+		else {
+			cout<<"Next greater element of "<<A[i]<<" is :"<<s.peek()<<endl;
+		}
+		s.push(A[i]);
+	}
+}
+
+void insertAtBottom(Stack<int> &s,int x) {
+	if(!s.isEmpty()) {
+		int t=s.pop();
+		insertAtBottom(s,x);
+		s.push(t);
+	}
+	else {
+		s.push(x);
+	}
+}
+
+void reverse_stack_recursion(Stack<int> &s) {
+	if(!s.isEmpty()) {
+		int x=s.pop();
+		reverse_stack_recursion(s);
+		insertAtBottom(s,x);
+	}
+}
+
+void sorted_insertion(Stack<int> &s,int x) {
+	if(!s.isEmpty()) {
+		if(x>s.peek()) {
+			int t=s.pop();
+			sorted_insertion(s,x);
+			s.push(t);
+		}
+		else
+			s.push(x);
+	}
+	else
+		s.push(x);
+}
+
+void sort_stack(Stack<int> &s) {
+	if(!s.isEmpty()) {
+		int x=s.pop();
+		sort_stack(s);
+		sorted_insertion(s,x);
+	}
+}
+
+void stock_span(int A[],int &spans[],int n) {
+	
+}
+
+int main() {
+	int A[]={100,80,60,70,60,75,85};
+	int n=sizeof(A)/sizeof(int);
+	/*Stack<int> s(n);
 	for(int i=0;i<n;i++) {
 		s.push(A[i]);
 	}
@@ -214,5 +322,27 @@ int main() {
 	cout<<"Evaluation of postfix : "<<postfix<<"\t\t->\tresult : "<<evaluate(postfix)<<endl;
 	string revstring="hey";
 	reverse_string(revstring);
+	postfix="{()}[]";
+	string ans=check_brackets_balanced(postfix)?"Balanced":"Not Balanced";
+	cout<<"The expression : "<<postfix<<" is : "<<ans<<endl;
+	misordered_print_next_greater_element(A,n);
+	reverseordered_print_next_greater_element(A,n);
+	cout<<"Stack being reversed: "<<endl;
+	s.display();
+	reverse_stack_recursion(s);
+	cout<<"Reversed Stack : "<<endl;
+	s.display();
+	cout<<"Unsorted stack: "<<endl;
+	s.display();
+	sort_stack(s);
+	cout<<"Sorted Stack : "<<endl;
+	s.display();*/
+	int spans[n];
+	stock_span(A,&spans,n);
+	cout<<"Spans : [";
+	for(int i=0;i<n;i++) {
+		cout<<spans[i]<<",";
+	}
+	cout<<"]"<<endl;
   return 0; 
 } 
