@@ -5,4 +5,7 @@ Arrays:
 To-do:	18(Hashing , BST), 19(Merge sort, AVL, BIT(Binary Indexed Tree))
 
 Linked List:
-Upto 7
+Upto 11,13
+*Revise recursive reverse LL.
+
+To-do: 12(Merge sort)

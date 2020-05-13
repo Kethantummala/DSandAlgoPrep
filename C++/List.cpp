@@ -34,6 +34,21 @@ int length_Recursive(list<int>& L1,list<int>::iterator it) {
 	return 1+length_Recursive(L1,++it);
 }
 
+void reverse_Blocks(auto List1,auto& List2,int k) {
+	while(!List1.empty()) {
+		list<int> tempList;
+		auto it1=List1.begin();
+		auto it2=it1;
+		advance(it2,k);
+		if(it2==it1) {
+			it2=List1.end();
+		}
+		tempList.splice(tempList.begin(),List1,it1,it2);
+		tempList.reverse();
+		List2.splice(List2.end(),tempList);
+	}
+}
+
 int main() {
 	list<int> List1;
 	for(int i=0;i<10;i++) {
@@ -51,8 +66,16 @@ int main() {
 	cout<<"Length of list(Recursive) : "<<length_Recursive(List1,List1.begin())<<endl;
 	it=List1.begin();
 	*it=269;
-	print_List(List1);
 	it2=next(it,9);
 	swap(*it,*it2);
+	print_List(List1);
+	List1.reverse();
+	print_List(List1);
+	list<int> List2={5,9,6,1};
+	List1.merge(List2);
+	print_List(List1);
+	List2.clear();
+	reverse_Blocks(List1,List2,3);
+	print_List(List2);
 	return 0;
 }
