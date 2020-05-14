@@ -49,6 +49,10 @@ void reverse_Blocks(auto List1,auto& List2,int k) {
 	}
 }
 
+void floyds_cycle_remove_optimized(auto L1) {
+	
+}
+
 int main() {
 	list<int> List1;
 	for(int i=0;i<10;i++) {
@@ -77,5 +81,10 @@ int main() {
 	List2.clear();
 	reverse_Blocks(List1,List2,3);
 	print_List(List2);
+	it2=List2.end();
+	advance(it2,-1);
+	cout<<*it2<<endl;
+	advance(it2,1);
+	cout<<*it2<<endl;
 	return 0;
 }
