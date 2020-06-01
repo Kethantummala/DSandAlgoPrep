@@ -1,348 +1,326 @@
 #include <iostream>
 #include <string>
+#include <stack>
+#include <vector>
 
 using namespace std;
 
 template<class T>
-class Stack {
-	int cap,top;
-	T *A;
-	
-	public:
-	
-	Stack(int n=100) {
-		cap=n;
-		A=new T[n];
-		top=-1;
+void displayStack(stack<T> s) {
+	while(!s.empty()) {
+		cout<<s.top()<<"\t";
+		s.pop();
 	}
-	
-	bool isFull() {
-		if(top==(cap-1))
-			return true;
-		return false;
-	}
-	
-	bool isEmpty() {
-		if(top==-1)
-			return true;
-		return false;
-	}
-	
-	T peek() {
-		if(!isEmpty()) {
-			return A[top];
-		}
-		T x;
-		return x;
-	}
-	
-	//Not a part of Stack ADT but using here for better understanding.
-	void display() {
-		cout<<"Stack : [";
-		for(int i=top;i>=0;i--) {
-			cout<<A[i]<<",";
-		}
-		cout<<"]"<<endl;
-	}
-	
-	//outside declared member functions
-	void push(T);
-	T pop();
-	
-	
-};
-
-template<class T>
-void Stack<T>::push(T x) {
-		if(!isFull()) {
-			A[++top]=x;
-			return;
-		}
-		cout<<"Push failed."<<endl;
+	cout<<endl;
 }
 
 template<class T>
-T Stack<T>::pop() {
-		if(!isEmpty()) {
-			return A[top--];
-		}
-		T x;
-		return x;
-		cout<<"Stack empty."<<endl;
+void displayVector(vector<T> v) {
+	typename vector<T>::iterator it=v.begin();
+	while(it!=v.end()) {
+		cout<<*it<<"\t";
+		++it;
+	}
+	cout<<endl;
 }
 
-bool isOperator(const char x) {
-	switch(x) {
+bool isOperator(char c) {
+	switch(c) {
 		case '+':
 		case '-':
 		case '*':
-		case '/':
 		case '^':
-		case '(':
-		case ')':		return true;
-		default:	return false;
+		case '/': return true;
+		default: return false;
 	}
 }
 
-int precedence(const char x) {
-	switch(x) {
-		case '+': 
-		case '-':
-			 return 1;  
-		case '*': 
-		case '/':
-			 return 2;  
-		case '^': 
-			 return 3;  
-		default:
-			 return 0;
+int precedence(char c) {
+	switch(c) {
+		case '+':
+		case '-': return 1;
+		case '*':
+		case '/': return 2;
+		case '^': return 3;
+		default : return 0;
 	}
 }
 
-void convert(const string infix,string &postfix) {
+string convertToPost(string infix) {
+	stack<char> s;
+	string postfix="";
 	int n=infix.size();
-	Stack<char> st(n);
 	for(int i=0;i<n;i++) {
-		char x=infix[i];
-		if(isOperator(x)) {
-			if(x=='(') {
-				st.push(x);
+		if(isOperator(infix[i])) {
+			while(!s.empty() && precedence(infix[i])<=precedence(s.top())) {
+				postfix+=s.top();
+				s.pop();
 			}
-			else {
-				if(x==')') {
-					while(st.peek()!='\0') {
-						if(st.peek()!='(') {
-							postfix+=st.pop();
-						}
-						else {
-							st.pop();
-							break;
-						}
-					}
-				}
-				else {
-					while((st.peek()!='\0') && precedence(x)<=precedence(st.peek())) {
-						postfix+=st.pop();
-					}
-					st.push(x);
-				}
-			}
+			s.push(infix[i]);
 		}
-		else {
-			postfix+=x;
+		else if(infix[i]=='(') {
+			s.push(infix[i]);
 		}
-	}
-	while(st.peek()!='\0') {
-		postfix+=st.pop();
-	}
-	cout<<"Converted Infix expression : ";
-	cout<<infix<<"\t";
-	cout<<"to\tPostfix expression : ";
-	cout<<postfix<<endl;
-}
-
-int evaluate(string postfix) {
-	int n=postfix.size();
-	Stack<int> st(n);
-	int op1,op2;//op=operand
-	string cop;
-	for(int i=0;i<n;i++) {
-		char x=postfix[i];
-		
-		if(isOperator(x)) {
-			st.push(stoi(cop));
-			cop="";
-			if(st.peek()!='\0')
-				op2=st.pop();
-			else {
-				cout<<"Invalid expression!"<<endl;
-				return -1;
+		else if(infix[i]==')') {
+			while(!s.empty() && s.top()!='(') {
+				postfix+=s.top();
+				s.pop();
 			}
-			
-			if(st.peek()!='\0')
-				op1=st.pop();
-			else {
-				cout<<"Invalid expression!"<<endl;
-				return -1;
-			}
-			
-			switch(x) {
-			case '+':st.push(op1+op2); break;
-			case '-':st.push(op1-op2); break;
-			case '*':st.push(op1*op2); break;
-			case '/':st.push(op1/op2); break;
-			case '^':st.push(op1^op2); break;
-			}
-		}
-		else if(x==' ') {
-			st.push(stoi(cop));
-			cop="";
-		}
-		else {
-			cop+=x;
-		}
-	}
-	return st.pop();
-}
-
-void reverse_string(string str) {
-	cout<<"Reverse of : "<<str<<" is : ";
-	int n=str.size();
-	Stack<char> st(n);
-	for(int i=0;i<n;i++) {
-		st.push(str[i]);
-	}
-	str="";
-	while(!st.isEmpty()) {
-		str+=st.pop();
-	}
-	cout<<str<<endl;
-}
-
-//Two stacks using a single array is skipped cause its easy enough and just time consuming to implement.
-
-bool check_brackets_balanced(const string exp) {
-	int n=exp.size();
-	Stack<char> s(n);
-	for(int i=0;i<n;i++) {
-		char x=exp[i];
-		if(x=='(' || x=='[' || x=='{') {
-			s.push(x);
-		}
-		else {
-			if(s.isEmpty()) {
-				return false;
-			}
-			if(x==')') {
-				if(s.pop()!='(')
-					return false;
-			}
-			else if(x==']') {
-				if(s.pop()!='[')
-					return false;
-			}
-			else {
-				if(s.pop()!='{')
-					return false;
-			}
-		}
-	}
-	if(!s.isEmpty())
-		return false;
-	return true;
-}
-
-void misordered_print_next_greater_element(const int A[],int n) {  //Checking if current element is greater than any previous element.	LEFT->RIGHT
-	Stack<int> s(n);
-	s.push(A[0]);
-	for(int i=1;i<n;i++) {
-		while(!s.isEmpty() && A[i]>=s.peek()) {
-			cout<<"Next greater element of "<<s.pop()<<" is :"<<A[i]<<endl;
-		}
-		s.push(A[i]);
-	}
-	while(!s.isEmpty()) {
-		cout<<"Next greater element of "<<s.pop()<<" is :"<<"-1"<<endl;
-	}
-}
-
-void reverseordered_print_next_greater_element(const int A[],int n) {		//Checking if current element has a greater element in stack.	RIGHT->LEFT
-	Stack<int> s(n);
-	for(int i=n-1;i>=0;i--) {
-		while(!s.isEmpty() && s.peek()<A[i]) {
 			s.pop();
 		}
-		if(s.isEmpty()) {
-			cout<<"Next greater element of "<<A[i]<<" is :"<<-1<<endl;
+		else {
+			postfix+=infix[i];
+		}
+	}
+	while(!s.empty()) {
+		postfix+=s.top();
+		s.pop();
+	}
+	return postfix;
+}
+
+double evaluatePost(string postfix) {
+	stack<double> s;
+	for(char c:postfix) {
+		if(isOperator(c)) {
+			double b=s.top();
+			s.pop();
+			double a=s.top();
+			s.pop();
+			switch(c) {
+				case '+': s.push(a+b);
+									break;
+				case '-': s.push(a-b);
+									break;
+				case '*': s.push(a*b);
+									break;
+				//case '^': s.push(a^b);
+				//					break;
+				case '/': s.push(a/b);
+									break;
+			}
 		}
 		else {
-			cout<<"Next greater element of "<<A[i]<<" is :"<<s.peek()<<endl;
+			s.push((double)(c-'0'));
 		}
-		s.push(A[i]);
+	}
+	return s.top();
+}
+
+string reverseStringUsingStack(string str) {
+	stack<char> s;
+	string reversed;
+	for(char c:str) {
+		s.push(c);
+	}
+	while(!s.empty()) {
+		reversed+=s.top();
+		s.pop();
+	}
+	return reversed;
+}
+
+bool balanced(string seq) {
+	stack<char> s;
+	for(char c:seq) {
+		if(c=='(' || c=='{' || c=='[') {
+			s.push(c);
+		}
+		else {
+			if(c==')') {
+				if(s.top()=='(') {
+					s.pop();
+				}
+				else
+					return false;
+			}
+		else if(c=='}') {
+				if(s.top()=='{') {
+					s.pop();
+				}
+				else
+					return false;
+			}
+			else {
+			if(s.top()=='[') {
+					s.pop();
+				}
+				else
+					return false;
+			}
+		}
+	}
+	if(s.empty())
+		return true;
+}
+
+void nextGreaterElement(int A[],int n) {
+	stack<int> s;
+	for(int i=0;i<n;i++) {
+		if(s.empty() || A[i]<=s.top()) {
+			s.push(A[i]);
+		}
+		else {
+			while(!s.empty() && s.top()<A[i]) {
+				cout<<s.top()<<"\t"<<A[i]<<endl;
+				s.pop();
+			}
+			s.push(A[i]);
+		}
+	}
+	while(!s.empty()) {
+		cout<<s.top()<<"\t"<<-1<<endl;
+		s.pop();
 	}
 }
 
-void insertAtBottom(Stack<int> &s,int x) {
-	if(!s.isEmpty()) {
-		int t=s.pop();
-		insertAtBottom(s,x);
-		s.push(t);
-	}
-	else {
+void insertAtBottom(stack<int> &s,int x) {
+	if(s.empty()) {
 		s.push(x);
+		return;
 	}
+	int y=s.top();
+	s.pop();
+	insertAtBottom(s,x);
+	s.push(y);
 }
 
-void reverse_stack_recursion(Stack<int> &s) {
-	if(!s.isEmpty()) {
-		int x=s.pop();
-		reverse_stack_recursion(s);
-		insertAtBottom(s,x);
+void rSR(stack<int> &s) {//reverseStackRecursively
+	if(s.empty()) {
+		return;
 	}
+	int y=s.top();
+	s.pop();
+	rSR(s);
+	insertAtBottom(s,y);
 }
 
-void sorted_insertion(Stack<int> &s,int x) {
-	if(!s.isEmpty()) {
-		if(x>s.peek()) {
-			int t=s.pop();
-			sorted_insertion(s,x);
-			s.push(t);
-		}
-		else
-			s.push(x);
+void sortedInsert(stack<int> &s,int x) {
+	if(!s.empty() && x>s.top()) {
+		int temp=s.top();
+		s.pop();
+		sortedInsert(s,x);
+		s.push(temp);
 	}
 	else
 		s.push(x);
 }
 
-void sort_stack(Stack<int> &s) {
-	if(!s.isEmpty()) {
-		int x=s.pop();
-		sort_stack(s);
-		sorted_insertion(s,x);
-	}
+void sortStack(stack<int> &s) {
+	if(s.empty())
+		return;
+	int temp=s.top();
+	s.pop();
+	sortStack(s);
+	sortedInsert(s,temp);
 }
 
-void stock_span(int A[],int &spans[],int n) {
+vector<int> stockSpan(vector<int> &v) {
+	stack<int> s;
+	int n=v.size();
+	vector<int> ans;
+	for(int i=0;i<n;i++) {
+		if(s.empty() || v[s.top()]>v[i]) {
+			s.push(i);
+			ans.push_back(1);
+			continue;
+		}
+		else {
+			while(!s.empty() && v[s.top()]<=v[i]) {
+				s.pop();
+			}
+			if(!s.empty())
+				ans.push_back(i-s.top());
+			else
+				ans.push_back(i+1);
+		}
+	}
+	return ans;
+}
+
+void specialPush(stack<int> &s,stack<int> &min,int x) {
+	if(s.empty()) {
+		s.push(x);
+		min.push(x);
+		return;
+	}
+	if(x<=min.top())
+		min.push(x);
+	s.push(x);
+}
+
+void specialPop(stack<int> &s,stack<int> &min) {
+	if(s.top()==min.top()) {
+		min.pop();
+	}
+	s.pop();
+}
+
+void simulateSpecialStack() {
+	stack<int> s2;
+	stack<int> min2;
+	specialPush(s2,min2,5);
+	cout<<"Original stack: ";
+	displayStack(s2);
+	cout<<"Min Stack: ";
+	displayStack(min2);
+	specialPush(s2,min2,6);
+	cout<<"Original stack: ";
+	displayStack(s2);
+	cout<<"Min Stack: ";
+	displayStack(min2);
+	specialPush(s2,min2,1);
+	cout<<"Original stack: ";
+	displayStack(s2);
+	cout<<"Min Stack: ";
+	displayStack(min2);
 	
+	specialPop(s2,min2);
+	cout<<"Original stack: ";
+	displayStack(s2);
+	cout<<"Min Stack: ";
+	displayStack(min2);
+	specialPop(s2,min2);
+	cout<<"Original stack: ";
+	displayStack(s2);
+	cout<<"Min Stack: ";
+	displayStack(min2);
+	specialPop(s2,min2);
+	cout<<"Original stack: ";
+	displayStack(s2);
+	cout<<"Min Stack: ";
+	displayStack(min2);
 }
 
 int main() {
-	int A[]={100,80,60,70,60,75,85};
-	int n=sizeof(A)/sizeof(int);
-	/*Stack<int> s(n);
-	for(int i=0;i<n;i++) {
-		s.push(A[i]);
-	}
-	s.display();
-	string infix="a+b*(c^d-e)^(f+g*h)-i";
-	string postfix;
-	convert(infix,postfix);
-	postfix="100 200+2/5*7+";
-	cout<<"Evaluation of postfix : "<<postfix<<"\t\t->\tresult : "<<evaluate(postfix)<<endl;
-	string revstring="hey";
-	reverse_string(revstring);
-	postfix="{()}[]";
-	string ans=check_brackets_balanced(postfix)?"Balanced":"Not Balanced";
-	cout<<"The expression : "<<postfix<<" is : "<<ans<<endl;
-	misordered_print_next_greater_element(A,n);
-	reverseordered_print_next_greater_element(A,n);
-	cout<<"Stack being reversed: "<<endl;
-	s.display();
-	reverse_stack_recursion(s);
-	cout<<"Reversed Stack : "<<endl;
-	s.display();
-	cout<<"Unsorted stack: "<<endl;
-	s.display();
-	sort_stack(s);
-	cout<<"Sorted Stack : "<<endl;
-	s.display();*/
-	int spans[n];
-	stock_span(A,&spans,n);
-	cout<<"Spans : [";
-	for(int i=0;i<n;i++) {
-		cout<<spans[i]<<",";
-	}
-	cout<<"]"<<endl;
-  return 0; 
-} 
+	cout<<"Postfix of 'a+b*(c^d-e)^(f+g*h)-i' is: "<<convertToPost("a+b*(c^d-e)^(f+g*h)-i")<<endl;
+	cout<<"'231*+9-' = "<<evaluatePost("231*+9-")<<endl;
+	cout<<"Reverse of 'GeeksQuiz' is: "<<reverseStringUsingStack("GeeksQuiz")<<endl;
+	cout<<"The given bracket sequence is: "<<(balanced("{()}[]")?"Balanced":"Not Balanced")<<endl;
+	
+	int TArray1[]={11, 13, 21, 3};
+	nextGreaterElement(TArray1,4);
+	
+	stack<int> s;
+	s.push(4);
+	s.push(3);
+	s.push(2);
+	s.push(1);
+	displayStack(s);
+	rSR(s);
+	displayStack(s);
+	
+	cout<<"Unsorted Stack: ";
+	displayStack(s);
+	sortStack(s);
+	cout<<"Sorted Stack: ";
+	displayStack(s);
+	
+	vector<int> v={100, 80, 60, 70, 60, 75, 85};
+	vector<int> ans=stockSpan(v);
+	cout<<"Stock span: ";
+	displayVector(ans);
+	
+	simulateSpecialStack();
+  return 0;
+}

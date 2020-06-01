@@ -9,3 +9,6 @@ Upto 11,13,15,16
 *Revise recursive reverse LL.
 
 To-do: 12(Merge sort),14
+
+Stacks:
+Upto 11
