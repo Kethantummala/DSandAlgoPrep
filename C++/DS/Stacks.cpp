@@ -419,6 +419,78 @@ void simulateStackUsingQueue() {
 	qs.display();
 }
 
+template<class T>
+class KStacks {
+	int n,k;
+	T *A;
+	int *tops,*next;
+	
+	public:
+	KStacks(int n,int k) {
+		this->n=n;
+		this->k=k;
+		A=(T*)malloc(sizeof(T)*n);
+		for(int j=0;j<n;j++) {
+			A[j]=-1;
+		}
+		tops=(int*)malloc(sizeof(int)*k);
+		for(int j=0;j<k;j++) {
+			tops[j]=-1;
+		}
+		next=(int*)malloc(sizeof(int)*n);
+		for(int j=0;j<n;j++) {
+			next[j]=-1;
+		}
+	}
+	
+	void push(T x,int cur_k) {
+		for(int i=0;i<n;i++) {
+			if(next[i]==-1) {
+				A[i]=x;
+				next[i]=tops[cur_k];
+				tops[cur_k]=i;
+				return;
+			}
+		}
+		cout<<"Overflow"<<endl;
+	}
+	
+	T pop(int cur_k) {
+		int i=tops[cur_k];
+		T x;
+		if(i==-1)
+			return x;
+		x=A[i];
+		tops[cur_k]=next[tops[cur_k]];
+		next[i]=-1;
+		return x;
+	}
+};
+
+void simulateKStacks() {
+	cout<<"Simulating KStacks"<<endl;
+	
+	KStacks<int> ks(10,3);
+	// Let us put some items in stack number 2 
+  ks.push(15, 2); 
+  ks.push(45, 2); 
+  
+	// Let us put some items in stack number 1 
+	ks.push(17, 1); 
+	ks.push(49, 1); 
+	ks.push(39, 1); 
+  
+	// Let us put some items in stack number 0 
+	ks.push(11, 0); 
+	ks.push(9, 0); 
+	ks.push(7, 0); 
+  
+	cout << "Popped element from stack 2 is " << ks.pop(2) << endl; 
+	cout << "Popped element from stack 1 is " << ks.pop(1) << endl; 
+	cout << "Popped element from stack 0 is " << ks.pop(0) << endl; 
+	
+}
+
 int main() {
 	cout<<"Postfix of 'a+b*(c^d-e)^(f+g*h)-i' is: "<<convertToPost("a+b*(c^d-e)^(f+g*h)-i")<<endl;
 	
@@ -456,5 +528,7 @@ int main() {
 	simulateStackUsingQueue2();
 	
 	simulateStackUsingQueue();
+	
+	simulateKStacks();
   return 0;
 }
