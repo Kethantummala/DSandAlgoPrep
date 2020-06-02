@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <stack>
+#include <queue>
 #include <vector>
 
 using namespace std;
@@ -257,6 +258,8 @@ void specialPop(stack<int> &s,stack<int> &min) {
 }
 
 void simulateSpecialStack() {
+	cout<<endl<<"***Simulating special stack(min element available)***"<<endl;
+	
 	stack<int> s2;
 	stack<int> min2;
 	specialPush(s2,min2,5);
@@ -292,10 +295,137 @@ void simulateSpecialStack() {
 	displayStack(min2);
 }
 
+template<class T>
+class stackUsingQueue2 {
+	queue<T> q1;
+	queue<T> q2;
+	int count=0;
+	
+	public:
+	void push(T x) {
+		if(q1.empty()) {
+			q1.push(x);
+		}
+		else {
+			q2.push(x);
+			while(!q1.empty()) {
+				q2.push(q1.front());
+				q1.pop();
+			}
+			queue<T> q=q1;
+			q1=q2;
+			q2=q;
+		}
+		++count;
+	}
+	
+	void pop() {
+		if(q1.empty()) {
+			cout<<"Underflow!"<<endl;
+		}
+		else {
+			q1.pop();
+			--count;
+		}
+	}
+	
+	void display() {
+		queue<T> q=q1;
+		if(q1.empty()) {
+			cout<<"Stack empty!"<<endl;
+			return;
+		}
+		while(!q1.empty()) {
+			cout<<q1.front()<<"\t";
+			q1.pop();
+		}
+		q1=q;
+		cout<<endl;
+	}
+};
+
+void simulateStackUsingQueue2() {
+	cout<<endl<<"***Simulating stack using Two queues***"<<endl;
+	stackUsingQueue2<int> qs;
+	qs.push(5);
+	qs.display();
+	qs.push(1);
+	qs.display();
+	qs.push(7);
+	qs.display();
+	qs.pop();
+	qs.display();
+	qs.pop();
+	qs.display();
+}
+
+template<class T>
+class stackUsingQueue {
+	queue<T> q1;
+	int count=0;
+	
+	public:
+	void push(T x) {
+		if(q1.empty()) {
+			q1.push(x);
+		}
+		else {
+			q1.push(x);
+			for(int i=0;i<count;++i) {
+				q1.push(q1.front());
+				q1.pop();
+			}
+		}
+		++count;
+	}
+	
+	void pop() {
+		if(q1.empty()) {
+			cout<<"Underflow!"<<endl;
+		}
+		else {
+			q1.pop();
+			--count;
+		}
+	}
+	
+	void display() {
+		queue<T> q=q1;
+		if(q1.empty()) {
+			cout<<"Stack empty!"<<endl;
+			return;
+		}
+		while(!q1.empty()) {
+			cout<<q1.front()<<"\t";
+			q1.pop();
+		}
+		q1=q;
+		cout<<endl;
+	}
+};
+
+void simulateStackUsingQueue() {
+	cout<<endl<<"***Simulating stack using One queue***"<<endl;
+	stackUsingQueue<int> qs;
+	qs.push(5);
+	qs.display();
+	qs.push(1);
+	qs.display();
+	qs.push(7);
+	qs.display();
+	qs.pop();
+	qs.display();
+	qs.pop();
+	qs.display();
+}
+
 int main() {
 	cout<<"Postfix of 'a+b*(c^d-e)^(f+g*h)-i' is: "<<convertToPost("a+b*(c^d-e)^(f+g*h)-i")<<endl;
+	
 	cout<<"'231*+9-' = "<<evaluatePost("231*+9-")<<endl;
+	
 	cout<<"Reverse of 'GeeksQuiz' is: "<<reverseStringUsingStack("GeeksQuiz")<<endl;
+	
 	cout<<"The given bracket sequence is: "<<(balanced("{()}[]")?"Balanced":"Not Balanced")<<endl;
 	
 	int TArray1[]={11, 13, 21, 3};
@@ -322,5 +452,9 @@ int main() {
 	displayVector(ans);
 	
 	simulateSpecialStack();
+	
+	simulateStackUsingQueue2();
+	
+	simulateStackUsingQueue();
   return 0;
 }
