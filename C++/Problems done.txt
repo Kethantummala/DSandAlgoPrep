@@ -11,4 +11,7 @@ Upto 11,13,15,16
 To-do: 12(Merge sort),14
 
 Stacks:
-Upto 11
+All
+
+Queue:
+All
