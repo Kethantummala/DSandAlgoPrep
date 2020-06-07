@@ -17,3 +17,6 @@ Queue:
 All
 
 Hashing
+Upto 3,5,7,8,9
+
+To-do: 4,
