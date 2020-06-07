@@ -61,17 +61,20 @@ void getItinerary(vector<pair<string,string>> data) {
 		cout<<currentCity<<"->"<<nextCity<<",";
 		currentCity=nextCity;
 	}
+	cout<<endl;
 }
 
-void noEmp(string ceo,unordered_multimap<string,string> mantoemp,unordered_map<string,int> ans) {
+void noEmp(string ceo,unordered_multimap<string,string> mantoemp,unordered_map<string,int> &ans) {
 	if(mantoemp.find(ceo)==mantoemp.end()) {
 		ans[ceo]=0;
 		return;
 	}
-	unsigned int bucketno=mantoemp.bucket(ceo);
-	auto it=mantoemp.begin(bucketno);
-	while(it!=mantoemp.end(bucketno)) {
-		noEmp(it->second,mantoemp,ans);
+	auto ceoEmps =mantoemp.equal_range(ceo);
+	
+	auto it=ceoEmps.first;
+	while(it!=ceoEmps.second) {
+		if(ans.find(it->second)==ans.end())
+			noEmp(it->second,mantoemp,ans);
 		ans[ceo]+=1+ans[it->second];
 		++it;
 	}
@@ -82,10 +85,12 @@ unordered_map<string,int> noEmployeesUnderEmployee(unordered_map<string,string> 
 	unordered_map<string,int> ans;
 	string ceo;
 	for(auto it=data.begin();it!=data.end();++it) {
-		mantoemp.insert((*it).second,(*it).first);
-		if((*it).first==(*it).second) {
-			ceo=(*it).first;
+		if(it->first==it->second) {
+			ceo=it->first;
+			continue;
 		}
+		mantoemp.insert(make_pair(it->second,it->first));
+		
 	}
 	noEmp(ceo,mantoemp,ans);
 	return ans;
@@ -100,7 +105,7 @@ void simulateEmployeesUnderEmployee() {
 																		{ "F", "F" }};
 	unordered_map<string,int> ans=noEmployeesUnderEmployee(data);
 	for(auto it=ans.begin();it!=ans.end();++it) {
-		cout<<(*it).first<<"-"<<(*it).second;
+		cout<<(*it).first<<"-"<<(*it).second<<endl;
 	}
 }
 
@@ -109,13 +114,17 @@ int main(int argc,char* argv[]) {
 	int n1=sizeof(A)/sizeof(A[0]),n2=sizeof(B)/sizeof(B[0]);
 	int sum=8;
 	findPair(A,n1,sum);
+	
 	(isSubsetOf1(A,B,n1,n2))?cout<<"Second array is subset of first array"<<endl:cout<<"Second array is not a subset of first array"<<endl;
+	
 	int C[]={1, 2, 3, 4, 1, 1, 3, 4};
 	int n3=8;
 	int k=3;
 	containsDuplicatesWithinK(C,n3,k)?cout<<"TRUE"<<endl:cout<<"FALSE"<<endl;
+	
 	vector<pair<string,string>> data={{"Chennai","Banglore"},{"Bombay","Delhi"},{"Goa","Chennai"},{"Delhi","Goa"}};
 	getItinerary(data);
+	
 	simulateEmployeesUnderEmployee();
 	return 0;
 }
