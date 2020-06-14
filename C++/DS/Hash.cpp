@@ -2,6 +2,14 @@
 
 using namespace std;
 
+template<class T>
+void displayList(list<T> l) {
+	for(auto it=l.begin();it!=l.end();++it) {
+		cout<<*it<<"->";
+	}
+	cout<<endl;
+}
+
 void findPair(int* A,int n,int sum) {
 	unordered_set <int> h;
 	for(int i=0;i<n;i++) {
@@ -109,6 +117,63 @@ void simulateEmployeesUnderEmployee() {
 	}
 }
 
+template<class T>
+list<T> findUnion(list<T> l1,list<T> l2) {
+	list<T> ans;
+	unordered_set<int> hashset;
+	for(auto it=l1.begin();it!=l1.end();++it) {
+		if(hashset.find(*it)==hashset.end()) {
+			hashset.insert(*it);
+			ans.push_back(*it);
+		}
+	}
+	for(auto it=l2.begin();it!=l2.end();++it) {
+		if(hashset.find(*it)==hashset.end()) {
+			hashset.insert(*it);
+			ans.push_back(*it);
+		}
+	}
+	return ans;
+}
+
+template<class T>
+list<T> findIntersection(list<T> l1,list<T> l2) {
+	list<T> ans;
+	unordered_set<int> hashset;
+	for(auto it=l1.begin();it!=l1.end();++it) {
+		if(hashset.find(*it)==hashset.end()) {
+			hashset.insert(*it);
+		}
+	}
+	for(auto it=l2.begin();it!=l2.end();++it) {
+		if(hashset.find(*it)!=hashset.end()) {
+			ans.push_back(*it);
+		}
+	}
+	return ans;
+}
+
+void simulateLinkedListUnionAndIntersection() {
+	list<int> l1,l2,ans;
+	l1.push_back(10);
+	l1.push_back(15);
+	l1.push_back(4);
+	l1.push_back(20);
+	
+	/*l2.insert(8);
+	l2.insert(4);
+	l2.insert(2);
+	l2.insert(10);*/
+	l2={8,4,2,10};
+	
+	cout<<"Union:";
+	ans=findUnion(l1,l2);
+	displayList(ans);
+	cout<<"Intersection:";
+	ans=findIntersection(l1,l2);
+	displayList(ans);
+}
+
 int main(int argc,char* argv[]) {
 	int A[]={1,2,3,9},B[]={5,9};
 	int n1=sizeof(A)/sizeof(A[0]),n2=sizeof(B)/sizeof(B[0]);
@@ -126,5 +191,7 @@ int main(int argc,char* argv[]) {
 	getItinerary(data);
 	
 	simulateEmployeesUnderEmployee();
+	
+	simulateLinkedListUnionAndIntersection();
 	return 0;
 }
