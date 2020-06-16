@@ -10,11 +10,32 @@ struct node {
 };
 
 template<class T>
+struct TBTNode{
+	T data;
+	struct TBTNode<T>* left;
+	struct TBTNode<T>* right;
+	
+	bool isThreaded;
+};
+
+template<class T>
 struct node<T>* newNode(T x) {
 	struct node<T> *temp=(struct node<T>*)malloc(sizeof(struct node<T>));
 	temp->data=x;
 	temp->left=NULL;
 	temp->right=NULL;
+	
+	return temp;
+};
+
+template<class T>
+TBTNode<T>* newTBTNode(T x) {
+	TBTNode<T> *temp=(TBTNode<T>*)malloc(sizeof(TBTNode<T>));
+	temp->data=x;
+	temp->left=NULL;
+	temp->right=NULL;
+	temp->isThreaded=false;
+	
 	
 	return temp;
 };
@@ -99,11 +120,13 @@ void printMorrisInorder(struct node<T>* root) {
 	struct node<T>* cur=root;
 	
 	while(cur) {
-		
 		if(!(cur->left)) {
 			cout<<cur->data<<" ";
 			cur=cur->right;
 		}
+		
+		if(!cur)
+			break;
 		
 		struct node<T>* predecessor=cur->left;
 		while(predecessor->right!=NULL && predecessor->right!=cur) {
@@ -120,6 +143,40 @@ void printMorrisInorder(struct node<T>* root) {
 			cur=cur->right;
 		}
 	}
+}
+
+template<class T>
+TBTNode<T>* tbtLeftMost(TBTNode<T>* root) {
+	if(!root)
+		return NULL;
+	
+	while(root->left) {
+		root=root->left;
+	}
+	return root;
+}
+
+template<class T>
+void printTBTInorder(TBTNode<T>* root) {
+	
+	TBTNode<T>* cur=tbtLeftMost(root);
+	
+	while(cur) {
+		
+		cout<<cur->data<<" ";
+		
+		if(cur->isThreaded)
+			cur=cur->right;
+		else
+			cur=tbtLeftMost(cur->right);
+	}
+}
+
+template<class T>
+int height(struct node<T>* root) {
+	if(!root)
+		return 0;
+	return max(height(root->left),height(root->right))+1;
 }
 
 int main(int argc,char* *argv) {
@@ -149,5 +206,22 @@ int main(int argc,char* *argv) {
 	
 	printf("\n***Iterative***(Morris Inorder Traversal) Inorder traversal(Threaded Binary tree) of binary tree is \n"); 
 	printMorrisInorder(root);
+	
+	struct TBTNode<int> *TBTRoot			 = newTBTNode(1);
+	TBTRoot->left          = newTBTNode(2);
+	TBTRoot->right         = newTBTNode(3);
+	
+	TBTRoot->left->left    = newTBTNode(4);
+	TBTRoot->left->left->right=TBTRoot->left;
+	TBTRoot->left->left->isThreaded=true;
+	
+	TBTRoot->left->right   = newTBTNode(5);
+	TBTRoot->left->right->right=TBTRoot;
+	TBTRoot->left->right->isThreaded=true;
+	
+	printf("\n***Iterative***(Threaded Binary Tree Inorder Traversal) Inorder traversal of binary tree is \n"); 
+	printTBTInorder(TBTRoot);
+	
+	printf("\nHeight of binary tree is:%d \n",height(root));
 	return 0;
 }
