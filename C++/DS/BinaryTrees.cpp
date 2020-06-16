@@ -61,6 +61,67 @@ void printBreadthTraversal(struct node<T>* root) {
 	}
 }
 
+template<class T>
+pair<int,int> findDiamaterDepth(struct node<T>* root) {
+	if(root==NULL)
+		return make_pair(0,0);
+	
+	//pair.first -> Diameter , pair.second -> depth
+	pair<int,int> left=findDiamaterDepth(root->left);
+	pair<int,int> right=findDiamaterDepth(root->right);
+	
+	int diam=max({left.first,right.first, left.second+right.second+1});
+	
+	return {diam,max(left.second,right.second)+1};
+}
+
+template<class T>
+void printIterativeInorder(struct node<T>* root) {
+	stack<struct node<T>*> s;
+	while(1) {
+		if(root==NULL) {
+			if(s.empty())
+				break;
+			root=s.top();
+			s.pop();
+			cout<<root->data<<" ";
+			root=root->right;
+		}
+		else {
+			s.push(root);
+			root=root->left;
+		}
+	}
+}
+
+template<class T>
+void printMorrisInorder(struct node<T>* root) {
+	struct node<T>* cur=root;
+	
+	while(cur) {
+		
+		if(!(cur->left)) {
+			cout<<cur->data<<" ";
+			cur=cur->right;
+		}
+		
+		struct node<T>* predecessor=cur->left;
+		while(predecessor->right!=NULL && predecessor->right!=cur) {
+			predecessor=predecessor->right;
+		}
+		
+		if(!predecessor->right) {
+			predecessor->right=cur;
+			cur=cur->left;
+		}
+		else {
+			predecessor->right=NULL;
+			cout<<cur->data<<" ";
+			cur=cur->right;
+		}
+	}
+}
+
 int main(int argc,char* *argv) {
 	struct node<int>* root=newNode(1);
 	root->left          = newNode(2);
@@ -79,5 +140,14 @@ int main(int argc,char* *argv) {
 	
 	printf("\nBreadth first traversal of binary tree is \n"); 
 	printBreadthTraversal(root);
+	
+	pair<int,int> diadep=findDiamaterDepth(root);
+	cout<<"\nDiameter of the tree:"<<diadep.first<<", depth of the root:"<<diadep.second<<endl;
+	
+	printf("\n***Iterative*** Inorder traversal(using 1 stack) of binary tree is \n"); 
+	printIterativeInorder(root);
+	
+	printf("\n***Iterative***(Morris Inorder Traversal) Inorder traversal(Threaded Binary tree) of binary tree is \n"); 
+	printMorrisInorder(root);
 	return 0;
 }
