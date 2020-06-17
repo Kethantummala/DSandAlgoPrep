@@ -248,8 +248,74 @@ void hashCloneRandomRandomBinaryTree(struct RNode<T>* root,struct RNode<T>* croo
 }
 
 template<class T>
-struct Rnode<T>* modifiedCloneLeftRightRandomBinaryTree() {
+struct RNode<T>* createmodifiedLeftRightRandomBinaryTree(struct RNode<T>* root) {
+	if(!root)
+		return NULL;
 	
+	struct RNode<T>* cnode=newRNode(root->data);
+	cnode->left=root->left;
+	root->left=cnode;
+	if(cnode->left)
+		createmodifiedLeftRightRandomBinaryTree(root->left->left);
+	cnode->right=createmodifiedLeftRightRandomBinaryTree(root->right);
+	
+	return root->left;
+}
+
+template<class T>
+void createmodifiedRandomRandomBinaryTree(struct RNode<T>* root,struct RNode<T>* croot) {
+	if(!root)
+		return;
+	
+	if(root->random)
+		croot->random=root->random->left;
+	else
+		croot->random=NULL;
+	
+	if(root->left&& croot->left)
+		createmodifiedRandomRandomBinaryTree(root->left->left,croot->left->left);
+	createmodifiedRandomRandomBinaryTree(root->right,croot->right);
+}
+
+template<class T>
+void getCloneTreeRoot(struct RNode<T>* root,struct RNode<T>* croot) {
+	if(!root)
+		return;
+	
+	if(croot->left) {
+		root->left=root->left->left;
+		croot->left=croot->left->left;
+	}
+	else
+		root->left=NULL;
+	
+	getCloneTreeRoot(root->left,croot->left);
+	getCloneTreeRoot(root->right,croot->right);
+}
+
+template<class T>
+struct node<T>* buildTree(T in[], T pre[], int a, int b) {//a->inStart,b->inEnd
+	static int preInd=0;
+	
+	if(a>b)
+		return NULL;
+	
+	struct node<T>* root=newNode(pre[preInd++]);
+	
+	if(a==b)
+		return root;
+	
+	int inInd;
+	for(int i=a;i<=b;i++)
+		if(in[i]==root->data)
+			inInd=i;
+	
+	root->left=buildTree(in,pre,a,inInd-1);
+	root->right=buildTree(in,pre,inInd+1,b);
+	
+	printInorder(root);
+	cout<<endl;
+	return root;
 }
 
 
@@ -311,9 +377,27 @@ int main(int argc,char* *argv) {
 	unordered_map<struct RNode<int>*,struct RNode<int>*> h;
 	struct RNode<int>* RCloneroot=hashCloneLeftRightRandomBinaryTree(ROrigroot,h);
 	hashCloneRandomRandomBinaryTree(ROrigroot,RCloneroot,h);
-	cout<<"\nOriginal Tree:";
+	cout<<"\n(Hash Cloning)Original Tree:";
 	printRandomInorder(ROrigroot);
-	cout<<"\nClone Tree:";
+	cout<<"\n(Hash Cloning)Clone Tree:";
 	printRandomInorder(RCloneroot);
+	
+	RCloneroot=createmodifiedLeftRightRandomBinaryTree(ROrigroot);
+	createmodifiedRandomRandomBinaryTree(ROrigroot,RCloneroot);
+	getCloneTreeRoot(ROrigroot,RCloneroot);
+	
+	cout<<"\n(Random Binary Tree Modification Cloning)Original Tree:";
+	printRandomInorder(ROrigroot);
+	cout<<"\n(Random Binary Tree Modification Cloning)Clone Tree:";
+	printRandomInorder(RCloneroot);
+	
+	char in[] = { 'D', 'B', 'E', 'A', 'F', 'C' }; 
+	char pre[] = { 'A', 'B', 'D', 'E', 'C', 'F' }; 
+	int len = sizeof(in) / sizeof(in[0]); 
+	struct node<char>* root2 = buildTree(in, pre, 0, len - 1); 
+
+	/* Let us test the built tree by printing Insorder traversal */
+	printf("Inorder traversal of the constructed tree is \n"); 
+	printInorder(root2);
 	return 0;
 }
