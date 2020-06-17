@@ -2,6 +2,8 @@
 
 using namespace std;
 
+//Node Structures
+
 template<class T>
 struct node {
 	T data;
@@ -17,6 +19,16 @@ struct TBTNode{
 	
 	bool isThreaded;
 };
+
+template<class T>
+struct RNode {
+	T data;
+	struct RNode<T>* left;
+	struct RNode<T>* right;
+	struct RNode<T>* random;
+};
+
+//functions
 
 template<class T>
 struct node<T>* newNode(T x) {
@@ -39,6 +51,18 @@ TBTNode<T>* newTBTNode(T x) {
 	
 	return temp;
 };
+
+template<class T>
+struct RNode<T>* newRNode(T x) {
+	struct RNode<T>* nnode=(struct RNode<T>*)malloc(sizeof(struct RNode<T>));
+	nnode->data=x;
+	nnode->left=NULL;
+	nnode->right=NULL;
+	nnode->random=NULL;
+	
+	return nnode;
+}
+
 
 template<class T>
 void printPreorder(struct node<T>* root) {
@@ -82,6 +106,8 @@ void printBreadthTraversal(struct node<T>* root) {
 	}
 }
 
+
+
 template<class T>
 pair<int,int> findDiamaterDepth(struct node<T>* root) {
 	if(root==NULL)
@@ -95,6 +121,8 @@ pair<int,int> findDiamaterDepth(struct node<T>* root) {
 	
 	return {diam,max(left.second,right.second)+1};
 }
+
+
 
 template<class T>
 void printIterativeInorder(struct node<T>* root) {
@@ -172,12 +200,59 @@ void printTBTInorder(TBTNode<T>* root) {
 	}
 }
 
+
+
 template<class T>
 int height(struct node<T>* root) {
 	if(!root)
 		return 0;
 	return max(height(root->left),height(root->right))+1;
 }
+
+
+
+template<class T>
+void printRandomInorder(struct RNode<T>* root) {
+	if(!root)
+		return;
+	printRandomInorder(root->left);
+	
+	cout<<"{"<<root->data<<",";
+	if(root->random)
+		cout<<root->random->data<<"} ";
+	else
+		cout<<"NULL"<<"} ";
+	
+	printRandomInorder(root->right);
+}
+
+template<class T>
+struct RNode<T>* hashCloneLeftRightRandomBinaryTree(struct RNode<T>* root,unordered_map<struct RNode<T>*,struct RNode<T>*> &h) {
+	if(!root)
+		return NULL;
+	struct RNode<T>* cNode=newRNode(root->data);
+	h[root]=cNode;
+	cNode->left=hashCloneLeftRightRandomBinaryTree(root->left,h);
+	cNode->right=hashCloneLeftRightRandomBinaryTree(root->right,h);
+	
+	return cNode;
+}
+
+template<class T>
+void hashCloneRandomRandomBinaryTree(struct RNode<T>* root,struct RNode<T>* croot,unordered_map<struct RNode<T>*,struct RNode<T>*> h) {
+	if(!croot)
+		return;
+	croot->random=h[root->random];
+	hashCloneRandomRandomBinaryTree(root->left,croot->left,h);
+	hashCloneRandomRandomBinaryTree(root->right,croot->right,h);
+}
+
+template<class T>
+struct Rnode<T>* modifiedCloneLeftRightRandomBinaryTree() {
+	
+}
+
+
 
 int main(int argc,char* *argv) {
 	struct node<int>* root=newNode(1);
@@ -223,5 +298,22 @@ int main(int argc,char* *argv) {
 	printTBTInorder(TBTRoot);
 	
 	printf("\nHeight of binary tree is:%d \n",height(root));
+	
+	struct RNode<int>* ROrigroot=newRNode(1);
+	ROrigroot->left=newRNode(2);
+	ROrigroot->right=newRNode(3);
+	ROrigroot->left->left=newRNode(4);
+	ROrigroot->left->right=newRNode(5);
+	ROrigroot->random = ROrigroot->left->right; 
+	ROrigroot->left->left->random = ROrigroot; 
+	ROrigroot->left->right->random = ROrigroot->right;
+		
+	unordered_map<struct RNode<int>*,struct RNode<int>*> h;
+	struct RNode<int>* RCloneroot=hashCloneLeftRightRandomBinaryTree(ROrigroot,h);
+	hashCloneRandomRandomBinaryTree(ROrigroot,RCloneroot,h);
+	cout<<"\nOriginal Tree:";
+	printRandomInorder(ROrigroot);
+	cout<<"\nClone Tree:";
+	printRandomInorder(RCloneroot);
 	return 0;
 }
