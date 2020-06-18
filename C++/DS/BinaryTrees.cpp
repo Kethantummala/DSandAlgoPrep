@@ -1,4 +1,5 @@
 #include<bits/stdc++.h>
+#include<string.h>
 
 using namespace std;
 
@@ -312,12 +313,167 @@ struct node<T>* buildTree(T in[], T pre[], int a, int b) {//a->inStart,b->inEnd
 	
 	root->left=buildTree(in,pre,a,inInd-1);
 	root->right=buildTree(in,pre,inInd+1,b);
-	
-	printInorder(root);
-	cout<<endl;
 	return root;
 }
 
+template<class T>
+int getMaxWidthLevelOrder(struct node<T>* root) {
+	queue<struct node<T>*> q;
+	q.push(root);
+	int maxWid=0,curWid;
+	while(!q.empty()) {
+		curWid=q.size();
+		if(curWid>maxWid)
+			maxWid=curWid;
+		while(curWid) {
+			struct node<T>* temp=q.front();
+			q.pop();
+			if(temp->left)
+				q.push(temp->left);
+			if(temp->right)
+				q.push(temp->right);
+			curWid--;
+		}
+	}
+	return maxWid;
+}
+
+template<class T>
+int getMaxWidthPreOrder(struct node<T>* root) {
+	int h=height(root);
+	int* widAtLev=(int *)calloc(sizeof(int),h);
+	getWidth(root,widAtLev,0);//root's level is represented at index 0 in widAtLev array.
+	return *max_element(widAtLev,widAtLev+h);
+}
+
+template<class T>
+void getWidth(struct node<T>* root, int widAtLev[], int level) {
+	if(!root)
+		return;
+	
+	widAtLev[level]++;
+	getWidth(root->left,widAtLev,level+1);
+	getWidth(root->right,widAtLev,level+1);
+}
+
+template<class T>
+void printKDistanceNodes(struct node<T>* root,int dist) {
+	if(!root)
+		return;
+	if(!dist) {
+		cout<<root->data<<" ";
+		return;
+	}
+	printKDistanceNodes(root->left,dist-1);
+	printKDistanceNodes(root->right,dist-1);
+}
+
+template<class T>
+bool printAncestors(struct node<T>* root, T x) {
+	if(!root)
+		return false;
+	if(root->data==x)
+		return true;
+	if(printAncestors(root->left,x) || printAncestors(root->right,x)) {
+		cout<<root->data<<" ";
+		return true;
+	}
+}
+
+template<class T>
+bool isSubTree(struct node<T>* root,struct node<T>* sroot) {
+	if(root==NULL && sroot==NULL)
+		return true;
+	if(!root || !sroot)
+		return false;
+	if(root->data==sroot->data)
+		return isSubTree(root->left,sroot->left) && isSubTree(root->right,sroot->right);
+	return false;
+}
+
+template<class T>
+bool checkSubtreeInTree(struct node<T>* root,struct node<T>* sroot) {
+	if(root==NULL && sroot==NULL)
+		return true;
+	if(!root || !sroot)
+		return false;
+	if(root->data==sroot->data)
+		return isSubTree(root,sroot);
+	if(checkSubtreeInTree(root->left,sroot) || checkSubtreeInTree(root->right,sroot))
+		return true;
+	return false;
+}
+
+template<class T>
+void getInOrder(struct node<T>* root,T* in,int &ind) {
+	if(!root) {
+		if(is_same<T,char>::value)
+			in[ind++]='N';
+		else if(is_same<T,int>::value)
+			in[ind++]=-1;
+		return;
+	}
+	getInOrder(root->left,in,ind);
+	in[ind++]=root->data;
+	getInOrder(root->right,in,ind);
+}
+
+template<class T>
+void getPreOrder(struct node<T>* root,T* pre,int &ind) {
+	if(!root) {
+		if(is_same<T,char>::value)
+			pre[ind++]='N';
+		else if(is_same<T,int>::value)
+			pre[ind++]=-1;
+		return;
+	}
+	pre[ind++]=root->data;
+	getPreOrder(root->left,pre,ind);
+	getPreOrder(root->right,pre,ind);
+}
+
+template<class T>
+void printarray(T* a,int n) {
+	cout<<endl;
+	for(int i=0;i<n;++i) {
+		cout<<a[i]<<" ";
+	}
+	cout<<endl;
+}
+
+template<class T>
+bool checkSubtreeInTreeUsingInPre(struct node<T>* root,struct node<T>* sroot) {
+	
+	int h1=pow(2,height(root)+1),ind1=0,ind2=0;
+	
+	T* in=(T*)calloc(sizeof(T),h1);
+	getInOrder(root,in,ind1);
+	
+	int h2=pow(2,height(sroot)+1);
+	
+	T* sin=(T*)calloc(sizeof(T),h2);
+	getInOrder(sroot,sin,ind2);
+	
+	printarray(in,ind1);
+	printarray(sin,ind2);
+	if (strstr(in, sin) == NULL)
+		return false;
+	
+	ind1=0;
+	ind2=0;
+	T* pre=(T*)calloc(sizeof(T),h1);
+	getPreOrder(root,pre,ind1);
+	
+	T* spre=(T*)calloc(sizeof(T),h2);
+	getPreOrder(sroot,spre,ind2);
+	
+	printarray(pre,ind1);
+	printarray(spre,ind2);
+	if (strstr(pre, spre) == NULL)
+		return false;
+	
+	return true;
+}
 
 
 int main(int argc,char* *argv) {
@@ -399,5 +555,38 @@ int main(int argc,char* *argv) {
 	/* Let us test the built tree by printing Insorder traversal */
 	printf("Inorder traversal of the constructed tree is \n"); 
 	printInorder(root2);
+	
+	printf("\nMax width of the tree is:%d",getMaxWidthLevelOrder(root));
+	printf("\nMax width of the tree is:%d",getMaxWidthPreOrder(root));
+	
+	printf("\nNode at distance 2 from root are:");
+	printKDistanceNodes(root,2);
+	
+	printf("\nAncestors of 3 in the tree are:");
+	printAncestors(root,3);
+	
+	struct node<int>* subTree=newNode(2);
+	subTree->left=newNode(4);
+	subTree->right=newNode(5);
+	if(checkSubtreeInTree(root,subTree))
+		cout<<"\nYES,It is a subtree.";
+	else
+		cout<<"\nNO, It is NOT a subtree.";
+	
+	struct node<char>* root3=newNode('1');
+	root3->left          = newNode('2');
+	root3->right         = newNode('3');
+	root3->left->left    = newNode('4');
+	root3->left->right   = newNode('5');
+	
+	struct node<char>* subTree3=newNode('2');
+	subTree3->left=newNode('4');
+	subTree3->right=newNode('5');
+	
+	cout<<"\n\nChecking existence of subtree using InOrder and PreOrder";
+	if(checkSubtreeInTreeUsingInPre(root3,subTree3))
+		cout<<"\nYES,It is a subtree.";
+	else
+		cout<<"\nNO, It is NOT a subtree.";
 	return 0;
 }
