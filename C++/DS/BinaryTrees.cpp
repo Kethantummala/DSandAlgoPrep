@@ -29,6 +29,14 @@ struct RNode {
 	struct RNode<T>* random;
 };
 
+template<class T>
+struct node2 {
+	T data;
+	struct node2<T>* left;
+	struct node2<T>* right;
+	struct node2<T>* nextRight;
+};
+
 //functions
 
 template<class T>
@@ -64,6 +72,17 @@ struct RNode<T>* newRNode(T x) {
 	return nnode;
 }
 
+template<class T>
+struct node2<T>* newNode2(T x) {
+	struct node2<T>* temp=(struct node2<T>*)malloc(sizeof(struct node2<T>));
+	temp->data=x;
+	temp->left=NULL;
+	temp->right=NULL;
+	temp->nextRight=NULL;
+	
+	return temp;
+}
+
 
 template<class T>
 void printPreorder(struct node<T>* root) {
@@ -81,6 +100,19 @@ void printInorder(struct node<T>* root) {
 	printInorder(root->left);
 	cout<<root->data<<" ";
 	printInorder(root->right);
+}
+
+template<class T>
+void printInorder2(struct node2<T>* root) {
+	if(!root)
+		return;
+	printInorder2(root->left);
+	cout<<"NextRight of "<<root->data<<" is ";
+	if(root->nextRight)
+		cout<<root->nextRight->data<<endl;
+	else
+		cout<<"NULL"<<endl;
+	printInorder2(root->right);
 }
 
 template<class T>
@@ -208,6 +240,13 @@ int height(struct node<T>* root) {
 	if(!root)
 		return 0;
 	return max(height(root->left),height(root->right))+1;
+}
+
+template<class T>
+int height2(struct node2<T>* root) {
+	if(!root)
+		return 0;
+	return max(height2(root->left),height2(root->right))+1;
 }
 
 
@@ -475,6 +514,34 @@ bool checkSubtreeInTreeUsingInPre(struct node<T>* root,struct node<T>* sroot) {
 	return true;
 }
 
+template<class T>
+void connectNodesAtSameLevel(struct node2<T>* root) {
+	int h=height2(root),count=0;
+	queue<struct node2<T>*> q;
+	q.push(root);
+	struct node2<T>* temp=NULL;
+	while(!q.empty()) {
+		count=q.size();
+		while(count) {
+			cout<<"TEST\n";
+			struct node2<T>* prev=temp;
+			temp=q.front();
+			q.pop();
+			
+			if(prev)
+				prev->nextRight=temp;
+			
+			if(temp->left)
+				q.push(temp->left);
+			if(temp->right)
+				q.push(temp->right);
+			
+			--count;
+		}
+		temp=NULL;
+	}
+}
+
 
 int main(int argc,char* *argv) {
 	struct node<int>* root=newNode(1);
@@ -588,5 +655,15 @@ int main(int argc,char* *argv) {
 		cout<<"\nYES,It is a subtree.";
 	else
 		cout<<"\nNO, It is NOT a subtree.";
+	
+	struct node2<char>* root4=newNode2('A');
+	root4->left=newNode2('B');
+	root4->right=newNode2('C');
+	root4->left->left=newNode2('D');
+	root4->left->right=newNode2('E');
+	root4->right->right=newNode2('F');
+	connectNodesAtSameLevel(root4);
+	cout<<"\nFollowing are the nextRights of nodes in tree:\n";
+	printInorder2(root4);
 	return 0;
 }
