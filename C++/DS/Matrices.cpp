@@ -225,6 +225,52 @@ int maxSizeSquareSubMatrix(T **mat,int rows,int cols) {
 	return ans;
 }
 
+template<class T>
+T** getTranspose(T **mat,int rows,int cols) {
+	T **mat2=new T*[cols];
+	for(int i=0;i<cols;i++) {
+		mat2[i]=new int[rows];
+	}
+	for(int i=0;i<rows;i++) {
+		for(int j=0;j<cols;++j) {
+			mat2[j][i]=mat[i][j];
+		}
+	}
+	return mat2;
+}
+
+template<class T>
+T maxSumRectangle(T **mat,int rows,int cols) {
+	T rowSums[rows]={0},ans;
+	for(int left=0;left<cols;++left) {
+		for(int right=left;right<cols;++right) {
+			for(int i=0;i<rows;++i) {
+				rowSums[i]+=mat[i][right];
+			}
+			
+			//Run Kadane's algo
+			T max,sum;
+			int top=0,bottom=0;
+			for(int j=0;j<rows;++j) {
+				bottom=j;
+				if(sum>max) {
+					max=sum;
+				}
+				if(sum+rowSums[j]>0) {
+					sum+=rowSums[j];
+				}
+				else {
+					top=j;
+					sum=rowSums[j];
+				}
+			}
+			if(ans<max)
+				ans=max;
+		}
+	}
+	return ans;
+}
+
 int main(int argc, char* *argv) {
 	
 	int **mat,rows1=4,cols1=4;
@@ -256,5 +302,37 @@ int main(int argc, char* *argv) {
 	printUniqueRows2(mat3,rows3,cols3);
 	printUniqueRows3(mat3,rows3,cols3);
 	cout<<"Maximum size of square sub-matrix with all 1s is:"<<maxSizeSquareSubMatrix(mat3,rows3,cols3)<<endl;
+	
+	int **mat3Transpose=getTranspose(mat3,rows3,cols3);
+	cout<<"Transpose of matrix3 is:"<<endl;
+	printMatrix(mat3Transpose,cols3,rows3);
+	cout<<endl;
+	
+	int rows4=4,cols4=5,**mat4=createMatrix<int>(rows4,cols4);
+	mat4[0][0]=1;
+	mat4[0][1]=2;
+	mat4[0][2]=-1;
+	mat4[0][3]=-4;
+	mat4[0][4]=-20;
+	
+	mat4[1][0]=-8;
+	mat4[1][1]=-3;
+	mat4[1][2]=4;
+	mat4[1][3]=2;
+	mat4[1][4]=1;
+	
+	mat4[2][0]=3;
+	mat4[2][1]=8;
+	mat4[2][2]=10;
+	mat4[2][3]=1;
+	mat4[2][4]=3;
+	
+	mat4[3][0]=-4;
+	mat4[3][1]=-1;
+	mat4[3][2]=1;
+	mat4[3][3]=7;
+	mat4[3][4]=-6;
+	
+	cout<<"Max sum of any rectangular sub matrix in mat4 is:"<<maxSumRectangle(mat4,rows4,cols4)<<endl;
 	return 0;
 }
