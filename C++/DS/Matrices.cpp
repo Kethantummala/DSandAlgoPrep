@@ -1,5 +1,4 @@
 #include<bits/stdc++.h>
-#include "BinaryHeap.h"
 
 using namespace std;
 
@@ -328,9 +327,113 @@ T** createAlternatingXOMatrix(int rows,int cols) {
 	return mat;
 }
 
+template<class T>
+struct SM {
+	T data;
+	int row;
+	int nextCol;
+	
+	SM(T d,int r,int nC) : data(d),row(r),nextCol(nC){}
+	
+	bool operator<(const struct SM& S) const{
+		return data>S.data;
+	}
+};
 
+template<class T>
+void printSorted(T **mat,int rows,int cols) {
+	
+	priority_queue<SM<T>> minHeap;
+	
+	for(int i=0;i<rows;++i) {
+		minHeap.push(SM<T>(mat[i][0],i,1));
+	}
+	while(minHeap.size()) {
+		SM<T> cur=minHeap.top();
+		cout<<cur.data<<" ";
+		minHeap.pop();
+		if(cur.nextCol<cols) {
+			minHeap.push(SM<T>(mat[cur.row][cur.nextCol],cur.row,cur.nextCol+1));
+		}
+	}
+	cout<<endl;
+}
 
+template<class T>
+void sumsOfKSizeSubSquares(T **mat,int rows,int cols,int k) {
+	T **newMat=createMatrix<T>(rows-(k-1),cols);
+	
+	for(int i=0;i<rows-(k-1);++i)
+		for(int j=0;j<cols;++j) {
+			newMat[i][j]=0;
+		}
+	
+	//Column wise sums are calculated by the two loops
+	for(int j=0;j<cols;j++) {
+		for(int i=0;i<k;++i) {
+			newMat[0][j]+=mat[i][j];
+		}
+	}
+	for(int j=0;j<cols;j++) {
+		for(int i=k;i<rows;++i) {
+			newMat[i-(k-1)][j]=newMat[i-k][j];
+			newMat[i-(k-1)][j]-=mat[i-k][j];
+			newMat[i-(k-1)][j]+=mat[i][j];
+		}
+	}
+	
+	//Final sums are calculated here with help of Column wise sums in the following two loops
+	for(int i=0;i<rows-(k-1);i++) {
+		T sum=0;
+		for(int j=0;j<k;++j) {
+			sum+=newMat[i][j];
+		}
+		cout<<sum<<" ";
+		for(int j=k;j<cols;++j) {
+			sum-=newMat[i][j-k];
+			sum+=newMat[i][j];
+			cout<<sum<<" ";
+		}
+		cout<<endl;
+	}
+}
 
+template<class T>
+int countRCSeperatedIslands(T **mat,int rows,int cols) {
+	int ans=0;
+	for(int i=0;i<rows;++i) {
+		for(int j=0;j<cols;++j) {
+			if(mat[i][j]=='X') {
+				if((i>0 && mat[i-1][j]=='O') || i==0) {
+					if((j>0 && mat[i][j-1]=='O') || j==0) {
+						ans++;
+					}
+				}
+			}
+		}
+	}
+	return ans;
+}
+
+template<class T>
+T commonElementInAllRows(T **mat,int rows,int cols) {
+	unordered_map<T,int> hash;
+	for(int j=0;j<cols;++j) {
+		hash[mat[0][j]]=1;
+	}
+	for(int i=1;i<rows;i++) {
+		for(int j=0;j<cols;++j) {
+			if(hash.find(mat[i][j])!=hash.end()) {
+				hash[mat[i][j]]++;
+			}
+		}
+	}
+	for(auto it=hash.begin();it!=hash.end();++it) {
+		if((*it).second==rows)
+			return (*it).first;
+	}
+	return -1;
+}
 
 int main(int argc, char* *argv) {
 	
@@ -371,33 +474,35 @@ int main(int argc, char* *argv) {
 	int rows4=4,cols4=5,**mat4=createMatrix<int>(rows4,cols4);
 	mat4[0][0]=1;
 	mat4[0][1]=2;
-	mat4[0][2]=-1;
-	mat4[0][3]=-4;
-	mat4[0][4]=-20;
+	mat4[0][2]=3;
+	mat4[0][3]=4;
+	mat4[0][4]=10;
 	
-	mat4[1][0]=-8;
-	mat4[1][1]=-3;
+	mat4[1][0]=-1;
+	mat4[1][1]=0;
 	mat4[1][2]=4;
-	mat4[1][3]=2;
-	mat4[1][4]=1;
+	mat4[1][3]=5;
+	mat4[1][4]=7;
 	
-	mat4[2][0]=3;
-	mat4[2][1]=8;
+	mat4[2][0]=-4;
+	mat4[2][1]=4;
 	mat4[2][2]=10;
-	mat4[2][3]=1;
-	mat4[2][4]=3;
+	mat4[2][3]=11;
+	mat4[2][4]=13;
 	
 	mat4[3][0]=-4;
 	mat4[3][1]=-1;
 	mat4[3][2]=1;
-	mat4[3][3]=7;
-	mat4[3][4]=-6;
+	mat4[3][3]=2;
+	mat4[3][4]=4;
 	
 	cout<<"Max sum of any rectangular sub matrix in mat4 is:"<<maxSumRectangle(mat4,rows4,cols4)<<endl;
 	
-	int rows5=1,cols5=2,**mat5=createMatrix<int>(rows5,cols5);
+	int rows5=2,cols5=2,**mat5=createMatrix<int>(rows5,cols5);
 	mat5[0][0]=-4;
 	mat5[0][1]=2;
+	mat5[1][0]=7;
+	mat5[1][1]=-13;
 	
 	int rows6=2,cols6=3,**mat6=createMatrix<int>(rows6,cols6);
 	mat6[0][0]=-8;
@@ -416,7 +521,12 @@ int main(int argc, char* *argv) {
 	char **mat7=createAlternatingXOMatrix<char>(rows7,cols7);
 	printMatrix(mat7,rows7,cols7);
 	
-	simulateMaxHeap();
-	simulateMinHeap();
+	printSorted(mat4,rows4,cols4);
+	
+	sumsOfKSizeSubSquares(mat4,rows4,cols4,3);
+	
+	cout<<"No of Row and Column wise seperated islands are:"<<countRCSeperatedIslands(mat7,rows7,cols7)<<endl;
+	
+	cout<<"The common element in all rows in mat4 is:"<<commonElementInAllRows(mat4,rows4,cols4)<<endl;
 	return 0;
 }

@@ -8,7 +8,7 @@ To-do:	18(Hashing , BST), 19(Merge sort, AVL, BIT(Binary Indexed Tree))
 **************************
 
 Matrices:
-Upto 1,2,3,4,5,6,7,8,9,10
+Upto 1,2,3,4,5,6,7,8,9,10,11,12(Found a simpler explanation),13,14
 
 To-do:4/6-2,3 ,7-Implace, Review 9(Strassen method)
 
