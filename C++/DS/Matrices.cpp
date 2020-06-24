@@ -1,4 +1,5 @@
 #include<bits/stdc++.h>
+#include "BinaryHeap.h"
 
 using namespace std;
 
@@ -414,5 +415,8 @@ int main(int argc, char* *argv) {
 	int rows7=6,cols7=7;
 	char **mat7=createAlternatingXOMatrix<char>(rows7,cols7);
 	printMatrix(mat7,rows7,cols7);
+	
+	simulateMaxHeap();
+	simulateMinHeap();
 	return 0;
 }
