@@ -1,3 +1,6 @@
 Moore's Voting Algorithm -> https://www.geeksforgeeks.org/majority-element/
 Kadane's Algorithm -> https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/
 Floyd's Cycle Detection Algorithm -> https://www.geeksforgeeks.org/detect-loop-in-a-linked-list/
+
+Algorithmic concepts:
+Master's theorem (Also for Time Complexities)

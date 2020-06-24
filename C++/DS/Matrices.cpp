@@ -241,27 +241,27 @@ T** getTranspose(T **mat,int rows,int cols) {
 
 template<class T>
 T maxSumRectangle(T **mat,int rows,int cols) {
-	T rowSums[rows]={0},ans;
+	T rowSums[rows]={0},ans=0;
 	for(int left=0;left<cols;++left) {
+		for(int z=0;z<rows;++z) {
+			rowSums[z]=0;
+		}
 		for(int right=left;right<cols;++right) {
 			for(int i=0;i<rows;++i) {
 				rowSums[i]+=mat[i][right];
 			}
 			
 			//Run Kadane's algo
-			T max,sum;
-			int top=0,bottom=0;
+			T max=INT_MIN,sum=0;
 			for(int j=0;j<rows;++j) {
-				bottom=j;
-				if(sum>max) {
-					max=sum;
-				}
 				if(sum+rowSums[j]>0) {
 					sum+=rowSums[j];
 				}
 				else {
-					top=j;
-					sum=rowSums[j];
+					sum=0;
+				}
+				if(sum>max) {
+					max=sum;
 				}
 			}
 			if(ans<max)
@@ -270,6 +270,66 @@ T maxSumRectangle(T **mat,int rows,int cols) {
 	}
 	return ans;
 }
+
+template<class T>
+T** multiplyNaive(T **mat1,int rows1,int cols1,T **mat2,int rows2,int cols2) {
+	T **ans=createMatrix<int>(rows1,cols2);
+	
+	for(int i=0;i<rows1;++i) {
+		for(int j=0;j<cols2;++j) {//cols in mat2
+			T sum=0;
+			for(int k=0;k<rows2;++k) {//rows in mat2
+				sum+=mat1[i][k]*mat2[k][j];
+			}
+			ans[i][j]=sum;
+		}
+	}
+	return ans;
+}
+
+template<class T>
+void fillPerimeter(T **mat,char x,int rs,int re,int cs,int ce) {
+	while(rs<re && cs<ce) {
+		for(int i=cs;i<ce;++i) {
+			mat[rs][i]=x;
+		}
+		rs++;
+		for(int i=rs;i<re;++i) {
+			mat[i][ce-1]=x;
+		}
+		ce--;
+		if(rs<re) {
+			for(int i=ce;i>=cs;--i) {
+				mat[re-1][i]=x;
+			}
+			re--;
+		}
+		if(cs<ce) {
+			for(int i=re;i>=rs;--i) {
+				mat[i][cs]=x;
+			}
+			cs++;
+		}
+		if(x=='X')
+			x='O';
+		else
+			x='X';
+	}
+}
+
+template<class T>
+T** createAlternatingXOMatrix(int rows,int cols) {
+	T **mat=new T*[rows];
+	for(int i=0;i<rows;++i) {
+		mat[i]=new T[cols];
+	}
+	fillPerimeter(mat,'X',0,rows,0,cols);
+	return mat;
+}
+
+
+
+
 
 int main(int argc, char* *argv) {
 	
@@ -306,7 +366,6 @@ int main(int argc, char* *argv) {
 	int **mat3Transpose=getTranspose(mat3,rows3,cols3);
 	cout<<"Transpose of matrix3 is:"<<endl;
 	printMatrix(mat3Transpose,cols3,rows3);
-	cout<<endl;
 	
 	int rows4=4,cols4=5,**mat4=createMatrix<int>(rows4,cols4);
 	mat4[0][0]=1;
@@ -334,5 +393,26 @@ int main(int argc, char* *argv) {
 	mat4[3][4]=-6;
 	
 	cout<<"Max sum of any rectangular sub matrix in mat4 is:"<<maxSumRectangle(mat4,rows4,cols4)<<endl;
+	
+	int rows5=1,cols5=2,**mat5=createMatrix<int>(rows5,cols5);
+	mat5[0][0]=-4;
+	mat5[0][1]=2;
+	
+	int rows6=2,cols6=3,**mat6=createMatrix<int>(rows6,cols6);
+	mat6[0][0]=-8;
+	mat6[0][1]=-3;
+	mat6[0][2]=4;
+	
+	mat6[1][0]=3;
+	mat6[1][1]=8;
+	mat6[1][2]=10;
+	
+	int **mulmat561=multiplyNaive(mat5,rows5,cols5,mat6,rows6,cols6);
+	cout<<"\nMultiplied matrix of mat5 and mat6 is:"<<endl;
+	printMatrix(mulmat561,rows5,cols6);
+	
+	int rows7=6,cols7=7;
+	char **mat7=createAlternatingXOMatrix<char>(rows7,cols7);
+	printMatrix(mat7,rows7,cols7);
 	return 0;
 }
