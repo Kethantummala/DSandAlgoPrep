@@ -21,6 +21,20 @@ To-do: 12(Merge sort),14	*Revise recursive reverse LL.
 
 **************************
 
+Doubly Linked List:
+Upto 
+
+To-do: 
+
+**************************
+
+Circular Linked List:
+Upto 
+
+To-do: 
+
+**************************
+
 Stacks:
 All
 
