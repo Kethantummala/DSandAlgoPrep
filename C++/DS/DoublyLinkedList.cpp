@@ -31,6 +31,7 @@ void printXORList(struct XORNode<T>* head) {
 		prev=cur;
 		cur=next;
 	}
+	cout<<endl;
 }
 
 template<class T>
@@ -57,12 +58,14 @@ void XORInsert(struct XORNode<T>** head,T x) {
 }
 
 template<class T>
-void insert(struct DLLNode<T>* head,T x) {
+void insert(struct DLLNode<T>** head,T x) {
 	struct DLLNode<T>* temp=(struct DLLNode<T>*)malloc(sizeof(struct DLLNode<T>));
 	temp->data=x;
-	struct DLLNode<T>* cur=head;
+	temp->next=NULL;
+	temp->prev=NULL;
+	struct DLLNode<T>* cur=*head;
 	if(!cur) {
-		head=temp;
+		*head=temp;
 		return;
 	}
 	while(cur->next) {
@@ -71,6 +74,36 @@ void insert(struct DLLNode<T>* head,T x) {
 	temp->prev=cur;
 	temp->next=cur->next;
 	cur->next=temp;
+}
+
+template<class T>
+void reverseDLL(struct DLLNode<T>** head) {
+	struct DLLNode<T>* temp;
+	struct DLLNode<T>* cur=*head;
+	while(cur) {
+		temp=cur->prev;
+		cur->prev=cur->next;
+		cur->next=temp;
+		cur=cur->prev;
+	}
+	*head=temp->prev;
+}
+
+template<class T>
+void deleteNode(struct DLLNode<int>** head,struct DLLNode<int>* node) {
+	if(!head || !node)
+		return;
+	
+	if(*head==node) {
+		*head=(*head)->next;
+		(*head)->prev=NULL;
+		return;
+	}
+	if(node->next) {
+		node->next->prev=node->prev;
+	}
+	node->prev->next=node->next;
+	free(node);
 }
 
 int main(int argc,char** argv) {
@@ -83,11 +116,17 @@ int main(int argc,char** argv) {
 	printXORList(head);
 	
 	struct DLLNode<int>* head2=NULL;
-	insert(head2,10);
-	insert(head2,20);
-	insert(head2,30);
-	insert(head2,40);
+	insert(&head2,10);
+	insert(&head2,20);
+	insert(&head2,30);
+	insert(&head2,40);
 	printDLL<int>(head2);
 	
+	struct DLLNode<int>* no1=head2->next;
+	deleteNode<int>(&head2,no1);
+	printDLL(head2);
+	
+	reverseDLL(&head2);
+	printDLL(head2);
 	return 0;
 }
