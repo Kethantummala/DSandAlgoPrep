@@ -24,11 +24,15 @@ class BST {
 	
 	void del(T x);
 	
-	BST<T>* inorderSuccesor();
+	BST<T>* inorderPredecessor();
 	
 	T getMin();
 	
 	pair<T,T> inorderSucPred();
+	
+	void lowestCommonAncestor(T v1,T v2);
+	
+	void inorderSuccessor(T x);
 	
 };
 
@@ -75,7 +79,7 @@ void BST<T>::inorder() {
 }
 
 template<class T>
-BST<T>* BST<T>::inorderSuccesor() {
+BST<T>* BST<T>::inorderPredecessor() {
 	BST<T>* root=this->left;
 	while(root->right) {
 		root=root->right;
@@ -93,7 +97,7 @@ void BST<T>::del(T x) {
 	while(root) {
 		if(root->data==x) {
 			if(root->left && root->right) {
-				BST<T>* temp=root->inorderSuccesor();
+				BST<T>* temp=root->inorderPredecessor();
 				root->data=temp->data;
 				root->left=temp->left;
 				return;
@@ -205,6 +209,65 @@ bool btIsBST2(struct node<T>* broot) {
 	return true;
 }
 
+template<class T>
+void BST<T>::lowestCommonAncestor(T v1,T v2) {
+	BST<T>* root=this;
+	while(root) {
+		if(root->data>v1 && root->data>v2) {
+			root=root->left;
+		}
+		else if(root->data<v1 && root->data<v2){
+			root=root->right;
+		}
+		else {
+			cout<<"lowest Common Ancestor of "<<v1<<" and "<<v2<<" is:"<<root->data<<endl;
+			return;
+		}
+	}
+	cout<<"No lowest common ancestor."<<endl;
+}
+
+template<class T>
+void BST<T>::inorderSuccessor(T x) {
+	BST<T>* root=this;
+	
+	while(root && root->data!=x) {
+		if(root->data>x) {
+			root=root->left;
+		}
+		else
+			root=root->right;
+	}
+	if(!root) {
+		cout<<"No Successor"<<endl;
+		return;
+	}
+	else {
+		if(root->right) {
+			root=root->right;
+			while(root->left) {
+				root=root->left;
+			}
+			cout<<"Successor of "<<x<<" is:"<<root->data<<endl;
+			return;
+		}
+		T ans=this->data;
+		root=this;
+		while(root) {
+			if(root->data>x) {
+				ans=root->data;
+				root=root->left;
+			}
+			else if(root->data<x)
+				root=root->right;
+			else {
+				cout<<"Successor of "<<x<<" is:"<<ans<<endl;
+				return;
+			}
+		}
+	}
+}
+
 void simulateBST() {
 	BST<int> root,temp;
 	root.insert(10);
@@ -249,6 +312,23 @@ void simulateBST() {
 	else
 		cout<<"Given BT is not a BST";
 	cout<<endl;
+	
+	BST<int> root2;
+	root2.insert(20);
+	root2.insert(8);
+	root2.insert(22);
+	root2.insert(12);
+	root2.insert(4);
+	root2.insert(14);
+	root2.insert(10);
+	
+	root2.inorder();
+	root2.lowestCommonAncestor(10,22);
+	
+	root2.inorderSuccessor(12);
+	root2.inorderSuccessor(4);
+	root2.inorderSuccessor(22);
+	root2.inorderSuccessor(8);
 }
 
 int main(int argc,char** argv) {
