@@ -53,7 +53,7 @@ To-do:3,6,17-3,
 **************************
 
 Binary Search Trees:
-Upto 1
+Upto 5
 
 To-do: 
 
