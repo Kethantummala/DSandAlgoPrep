@@ -34,6 +34,7 @@ class BST {
 	
 	void inorderSuccessor(T x);
 	
+	void kThSmallest(int &c,int k);
 };
 
 template<class T>
@@ -268,6 +269,23 @@ void BST<T>::inorderSuccessor(T x) {
 	}
 }
 
+template<class T>
+void BST<T>::kThSmallest(int &c,int k) {
+	BST<T>* root=this;
+	if(root) {
+		if(root->left)
+			root->left->kThSmallest(c,k);
+		++c;
+		if(c==k) {
+			cout<<k<<"th smallest element is:"<<root->data<<endl;
+			return;
+		}
+		if(root->right) {
+			root->right->kThSmallest(c,k);
+		}
+	}
+}
+
 void simulateBST() {
 	BST<int> root,temp;
 	root.insert(10);
@@ -329,6 +347,9 @@ void simulateBST() {
 	root2.inorderSuccessor(4);
 	root2.inorderSuccessor(22);
 	root2.inorderSuccessor(8);
+	
+	int c=0;
+	root2.kThSmallest(c,3);
 }
 
 int main(int argc,char** argv) {
