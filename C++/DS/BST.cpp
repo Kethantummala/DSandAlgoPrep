@@ -12,11 +12,14 @@ struct node {
 template<class T>
 class BST {
 	
+	public:
 	T data;
 	BST *left,*right;
 	
-	public:
+	//Methods
 	BST(T x=0);
+	
+	BST<T>* getInstance();
 	
 	void insert(T x);
 	
@@ -35,10 +38,23 @@ class BST {
 	void inorderSuccessor(T x);
 	
 	void kThSmallest(int &c,int k);
+	
+	void printSortedOrderOfBSTs(BST<T> root2);
+	
+	void correctTheSwappedBST();
+	void getSwappedNodes(BST<T> **first,BST<T> **middle,BST<T> **last,BST<T> **prev);
+	
+	T ceil(T x);
+	T floor(T x);
 };
 
 template<class T>
 BST<T>::BST(T x):data(x),left(NULL),right(NULL) {}
+
+template<class T>
+BST<T>* BST<T>::getInstance() {
+	return this;
+}
 
 template<class T>
 void BST<T>::insert(T x) {
@@ -286,6 +302,163 @@ void BST<T>::kThSmallest(int &c,int k) {
 	}
 }
 
+template<class T>
+void BST<T>::printSortedOrderOfBSTs(BST<T> root2) {
+	stack<BST<T>*> s1,s2;
+	BST<T>* cur1=this;
+	BST<T>* cur2=root2.getInstance();
+	
+	if(!cur1->data) {
+		cur2->inorder();
+		return;
+	}
+	
+	else if(!cur2->data) {
+		cur1->inorder();
+		return;
+	}
+	
+	while(cur1 || !s1.empty() || cur2 || !s2.empty()) {
+		
+		if(cur1 || cur2) {
+			
+			if(cur1) {
+				s1.push(cur1);
+				cur1=cur1->left;
+			}
+			if(cur2) {
+				s2.push(cur2);
+				cur2=cur2->left;
+			}
+			
+		}
+		
+		else {
+			
+			if(s1.empty()) {
+				while(!s2.empty()) {
+					BST<T>* tRoot=s2.top();
+					s2.pop();
+					tRoot->left=NULL;
+					tRoot->inorder();
+				}
+				return;
+			}
+			if(s2.empty()) {
+				while(!s1.empty()) {
+					BST<T>* tRoot=s1.top();
+					s1.pop();
+					tRoot->left=NULL;
+					tRoot->inorder();
+				}
+				return;
+			}
+			
+			cur1=s1.top();
+			s1.pop();
+			cur2=s2.top();
+			s2.pop();
+			
+			if(cur1->data<cur2->data) {
+				cout<<cur1->data<<" ";
+				cur1=cur1->right;
+				s2.push(cur2);
+				cur2=NULL;
+			}
+			else {
+				cout<<cur2->data<<" ";
+				cur2=cur2->right;
+				s1.push(cur1);
+				cur1=NULL;
+			}
+			
+		}
+		
+	}
+	
+}
+
+template<class T>
+void BST<T>::getSwappedNodes(BST<T>** first,BST<T>** middle,BST<T>** last,BST<T>** prev) {
+	
+	if(this) {
+		
+		if(this->left)
+			(this->left)->getSwappedNodes(first,middle,last,prev);
+		
+		if(*prev && (this->data)<((*prev)->data)) {
+			if(*first) {
+				*last=this;
+			}
+			else {
+				*first=*prev;
+				*middle=this;
+			}
+		}
+		*prev=this;
+		if(this->right)
+			this->right->getSwappedNodes(first,middle,last,prev);
+	}
+	
+}
+
+template<class T>
+void BST<T>::correctTheSwappedBST() {
+	BST<T> *first,*middle,*last,*prev;
+	first=middle=last=prev=NULL;
+	
+	this->getSwappedNodes(&first,&middle,&last,&prev);
+	
+	if(first && last) {
+		T temp=first->data;
+		first->data=last->data;
+		last->data=temp;
+	}
+	else if(first && middle) {
+		T temp=first->data;
+		first->data=middle->data;
+		middle->data=temp;
+	}
+	else {
+		cout<<"No Swapping required."<<endl;
+	}
+	
+}
+
+template<class T>
+T BST<T>::ceil(T x) {
+	
+	if(this->data==x) {
+		return x;
+	}
+	if(this->data<x) {
+		if(this->right)
+			return this->right->ceil(x);
+		return -1;
+	}
+	
+	if(this->left)
+		return this->left->ceil(x);
+	return this->data;
+}
+
+template<class T>
+T BST<T>::floor(T x) {
+	
+	if(this->data==x) {
+		return x;
+	}
+	if(this->data>x) {
+		if(this->left)
+			return this->left->floor(x);
+		return -1;
+	}
+	
+	if(this->right)
+		return this->right->floor(x);
+	return this->data;
+}
+
 void simulateBST() {
 	BST<int> root,temp;
 	root.insert(10);
@@ -350,6 +523,36 @@ void simulateBST() {
 	
 	int c=0;
 	root2.kThSmallest(c,3);
+	
+	cout<<"Elements in 'root' node:";
+	root.inorder();
+	cout<<endl;
+	cout<<"Elements in 'root2' node:";
+	root2.inorder();
+	cout<<endl;
+	
+	root.printSortedOrderOfBSTs(root2);
+	cout<<endl;
+	
+	BST<int>* temp2=root2.getInstance();
+	/*while(temp2) {
+		cout<<"Data:"<<temp2->data<<endl;
+		temp2=temp2->left;
+	}*/
+	
+	temp2->left->data=22;
+	temp2->right->data=8;
+	cout<<"Before the Swap correction."<<endl;
+	root2.inorder();
+	cout<<endl;
+	root2.correctTheSwappedBST();
+	cout<<"After the Swap correction."<<endl;
+	root2.inorder();
+	cout<<endl;
+	
+	cout<<"Ceil of 23 in root2 is:"<<root2.ceil(23)<<endl;
+	cout<<"Floor of 3 in root2 is:"<<root2.floor(3)<<endl;
+	
 }
 
 int main(int argc,char** argv) {

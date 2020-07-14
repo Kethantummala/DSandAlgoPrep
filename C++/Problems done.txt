@@ -53,9 +53,9 @@ To-do:3,6,17-3,
 **************************
 
 Binary Search Trees:
-Upto 8
+Upto 11
 
-To-do: 
+To-do: Review 9 and all its related articles.
 
 **************************
 
