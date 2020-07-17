@@ -53,7 +53,7 @@ To-do:3,6,17-3,
 **************************
 
 Binary Search Trees:
-Upto 13
+All
 
 To-do: Review 9 and all its related articles.
 

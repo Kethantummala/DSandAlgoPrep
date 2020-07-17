@@ -114,7 +114,7 @@ void BSTToDLL(node<T>* root,node<T>** head,node<T>** tail) {
 	
 	if(!root)
 		return;
-	cout<<root->data<<endl;
+	
 	BSTToDLL(root->left,head,tail);
 	
 	root->left=*tail;
@@ -234,30 +234,142 @@ bool isPairPresent(node<T>* broot,T sum) {
 
 //Problem 14 Functions
 
-unsigned long int fact(int n,long int *arr) {
+unsigned long long int fact(int n,unsigned long long int *arr) {
 	
-	if(arr[n]!=0)
-		return arr[n];
+	unsigned long long int ans=1;
 	
-	arr[n]=(long int)n*fact(n-1,arr);
-	cout<<n<<"factorial="<<arr[n]<<endl;
-	return arr[n];
-	
+	while(n) {
+		ans*=n--;
+	}
+	return ans;
 }
 
-unsigned long int catalan(int n,long int *arr) {
+unsigned long long int binomialCoefficient(unsigned long long int n,unsigned long long int r) {
+	unsigned long long int ans=1;
 	
-	unsigned long int ans=fact(2*n,arr);
-	ans/=fact(n+1,arr)*fact(n,arr);
+	for(int i=0;i<r;++i) {
+		
+		ans*=(n-i);
+		ans/=i+1;
+		
+	}
+	
 	return ans;
 	
 }
 
-unsigned long int noOfPossibleBSTs(int n,long int *arr) {
+unsigned long long int catalan(int n,unsigned long long int *arr) {
+	
+	return binomialCoefficient(2*n,n)/(n+1);
+	
+}
+
+unsigned long long int noOfPossibleBSTs(int n,unsigned long long int *arr) {
 	
 	return catalan(n,arr);
 	
 }	
+
+//Problem 15 Functions
+template<class T>
+struct node<T>* RecursiveMergeDLLs(struct node<T>* droot1,struct node<T>* droot2,struct node<T>* prev) {
+	
+	struct node<T>* ans=NULL;
+	
+	if(!droot1) {
+		return droot2;
+	}
+	if(!droot2) {
+		return droot1;
+	}
+	//cout<<droot1->data<<","<<droot2->data<<" ";
+	if(droot1->data<droot2->data) {
+		ans=droot1;
+		ans->left=prev;
+		ans->right=RecursiveMergeDLLs(droot1->right,droot2,droot1);
+	}
+	else {
+		ans=droot2;
+		ans->left=prev;
+		ans->right=RecursiveMergeDLLs(droot1,droot2->right,droot2);
+	}
+	
+	return ans;
+}
+
+template<class T>
+struct node<T>* mergeBSTs(struct node<T>* r1,struct node<T>* r2) {
+	
+	struct node<T>* dll1=NULL,*tail1=NULL;
+	BSTToDLL(r1,&dll1,&tail1);
+	struct node<T>* dll2=NULL,*tail2=NULL;
+	BSTToDLL(r2,&dll2,&tail2);
+	
+	struct node<T>* prev=NULL,*mergedDLL=NULL;
+	mergedDLL=RecursiveMergeDLLs(dll1,dll2,prev);
+	
+	return sortedListToBST(mergedDLL);
+	
+}
+
+//Problem 16
+template<class T>
+int countBTNodes(struct node<T>* btroot) {
+	
+	if(!btroot)
+		return 0;
+	
+	return countBTNodes(btroot->left)+1+countBTNodes(btroot->right);
+	
+}
+
+template<class T>
+void storeInorder(struct node<T>* btroot,T *arr,int *iPtr) {
+	
+	if(!btroot)
+		return;
+	
+	storeInorder(btroot->left,arr,iPtr);
+	
+	arr[*iPtr]=btroot->data;
+	(*iPtr)++;
+	
+	storeInorder(btroot->right,arr,iPtr);
+	
+}
+
+template<class T>
+struct node<T>* arrayToBST(T *arr,int start,int end) {
+	
+	if(start>end)
+		return NULL;
+	
+	int mid=start+(end-start)/2;
+	
+	struct node<T>* root=new node<T>(arr[mid]);
+	
+	root->left=arrayToBST(arr,start,mid-1);
+	
+	root->right=arrayToBST(arr,mid+1,end);
+	
+	return root;
+	
+}
+
+template<class T>
+struct node<T>* BTToBST(struct node<T>* btroot) {
+	
+	int n=countBTNodes(btroot);
+	
+	T arr[n];
+	int ind=0;
+	storeInorder(btroot,arr,&ind);
+	
+	sort(arr,arr+n);
+	
+	return arrayToBST(arr,0,n-1);
+	
+}
 
 template<class T>
 void simulateBST2() {
@@ -327,13 +439,48 @@ void simulateBST2() {
 	cout<<endl<<endl;
 	//_______________________Problem 13(Method-4)______________________________
 	
-	int n=59;
-	long int arr[2*n+1]={0};
+	int n=30;
+	unsigned long long int arr[2*n+1]={0};
 	arr[1]=1;
 	cout<<"No of possible BST's with '"<<n<<"' nodes:"<<noOfPossibleBSTs(n,arr);
 	
 	cout<<endl<<endl;
 	//_______________________Problem 14_______________________
+	
+	node<T>* root3 = NULL;  
+	root3 = insert(root3, 6);
+	root3 = insert(root3, -13);
+	root3 = insert(root3, 14);
+	root3 = insert(root3, -8);
+	root3 = insert(root3, 15);
+	root3 = insert(root3, 13);
+	root3 = insert(root3, 7);
+	
+	node<T>* root4 = NULL;  
+	root4 = insert(root4, 62);
+	root4 = insert(root4, -130);
+	root4 = insert(root4, 4);
+	root4 = insert(root4, -8);
+	
+	struct node<T>* mergedRoot=mergeBSTs(root3,root4);
+	
+	inorder(mergedRoot);
+	
+	cout<<endl<<endl;
+	//_______________________Problem 15_______________________
+	
+	struct node<T>* root5=new node<T>(10);
+	root5->left=new node<T>(30);
+	root5->right=new node<T>(15);
+	root5->left->left=new node<T>(20);
+	root5->right->right=new node<T>(5);
+	
+	struct node<T>* nBST=BTToBST(root5);
+
+	inorder(nBST);
+	
+	cout<<endl<<endl;
+	//_______________________Problem 16_______________________
 }
 
 int main(int argc,char** argv) {
