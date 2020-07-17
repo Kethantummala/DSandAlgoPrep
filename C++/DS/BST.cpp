@@ -1,3 +1,7 @@
+/*
+			Contains Solutions for 1-11
+*/
+
 #include<bits/stdc++.h>
 
 using namespace std;
