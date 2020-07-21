@@ -154,6 +154,68 @@ bool detectCycleUndirected(pair<list<T>*,int> adj) {
 	
 }
 
+template<class T>
+bool detectCycleUndirected2(pair<list<T>*,int> adj) {
+	
+	T root=0;
+	
+	bool vis[adj.second]{false};
+	stack<T> s;
+	s.push(root);
+	
+	while(!s.empty()) {
+		
+		root=s.top();
+		s.pop();
+		
+		if(!vis[root]) {
+			vis[root]=true;
+		}
+		
+		for(auto it=adj.first[root].begin();it!=adj.first[root].end();++it) {
+			if(vis[*it] && *it!=root)
+				return true;
+			else {
+				s.push(*it);
+			}
+		}
+	}
+	return false;
+	
+}
+
+template<class T>
+void printTopologicalSortUtil(pair<list<T>*,int> adj,int i,bool vis[],stack<T> &s) {
+	
+	vis[i]=true;
+	
+	for(auto it=adj.first[i].begin();it!=adj.first[i].end();++it) {
+		if(!vis[*it]) {
+			printTopologicalSortUtil(adj,*it,vis,s);
+		}
+	}
+	s.push(i);
+}
+
+template<class T>
+void printTopologicalSort(pair<list<T>*,int> adj) {
+	
+	bool vis[adj.second]{false};
+	stack<T> s;
+	
+	for(int i=0;i<adj.second;++i) {
+		if(!vis[i])
+			printTopologicalSortUtil(adj,i,vis,s);
+	}
+	
+	while(!s.empty()) {
+		cout<<s.top()<<" ";
+		s.pop();
+	}
+	cout<<endl;
+	
+}
+
 int main(int argc,char** argv) {
 	
 	pair<list<int>*,int> G1=createGraph<int>(4);
@@ -186,6 +248,34 @@ int main(int argc,char** argv) {
 	}
 	else
 		cout<<"No cycle!"<<endl;
+	
+	if(detectCycleUndirected2(G2)) {
+		cout<<"Cycle Detected!"<<endl;
+	}
+	else
+		cout<<"No cycle!"<<endl;
+	
+	pair<list<int>*,int> G3=createGraph<int>(3);
+	
+	insert(G2,0,1);
+	insert(G2,1,2);
+	
+	if(detectCycleUndirected2(G3)) {
+		cout<<"Cycle Detected!"<<endl;
+	}
+	else
+		cout<<"No cycle!"<<endl;
+	
+	pair<list<int>*,int> G4=createGraph<int>(6);
+	
+	insert(G4,5,2);
+	insert(G4,5,0);
+	insert(G4,4,0);
+	insert(G4,4,1);
+	insert(G4,2,3);
+	insert(G4,2,1);
+	
+	printTopologicalSort(G4);
 	
 	return 0;
 }
