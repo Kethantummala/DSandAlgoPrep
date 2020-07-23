@@ -60,9 +60,9 @@ To-do: Review 9 and all its related articles.
 **************************
 
 Graphs:
-Upto 8,10,
+Upto 11
 
-To-do: 9
+To-do: 
 
 **************************
 

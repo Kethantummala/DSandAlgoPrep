@@ -14,10 +14,24 @@ pair<list<T>*,int> createGraph(int V) {
 	return make_pair(adj,V);
 }
 
+pair<list<pair<int,float>>*,int> createWeightedGraph(int V) {
+	
+	list<pair<int,float>> *adj=new list<pair<int,float>>[V];
+	
+	return make_pair(adj,V);
+	
+}
+
 template<class T>
 void insert(pair<list<T>*,int> adj,T a,T b) {
 	
 	adj.first[a].push_back(b);
+	
+}
+
+void weightedInsert(pair<list<pair<int,float>>*,int> adj,int u,int v,float weight) {
+	
+	adj.first[u].push_back(make_pair(v,weight));
 	
 }
 
@@ -216,6 +230,83 @@ void printTopologicalSort(pair<list<T>*,int> adj) {
 	
 }
 
+void WeightedNodesTopologicalSortUtil(pair<list<pair<int,float>>*,int> adj,int i,bool vis[],stack<int> &s) {
+	
+	vis[i]=true;
+	
+	for(auto it=adj.first[i].begin();it!=adj.first[i].end();++it) {
+		if(!vis[(*it).first]) {
+			WeightedNodesTopologicalSortUtil(adj,((*it).first),vis,s);
+		}
+	}
+	s.push(i);
+}
+
+void printLongestPathDistances(pair<list<pair<int,float>>*,int> adj,int src) {
+	
+	stack<int> s;
+	bool vis[adj.second]{false};
+	
+	for(int i=0;i<adj.second;++i) {
+		if(!vis[i])
+			WeightedNodesTopologicalSortUtil(adj,i,vis,s);
+	}
+	
+	float dist[adj.second]{INT_MIN};
+	dist[src]=0;
+	
+	while(!s.empty()) {
+		
+		int root=s.top();
+		s.pop();
+		if(dist[root]!=INT_MIN)
+			for(auto it=adj.first[root].begin();it!=adj.first[root].end();++it) {
+				
+				if(dist[(*it).first]<dist[root]+(*it).second) {
+					dist[(*it).first]=dist[root]+(*it).second;
+				}
+			}
+	}
+	
+	for(int i=0;i<adj.second;++i) {
+		(dist[i]==INT_MIN)? cout<<"-INF " : cout<<dist[i]<<" ";
+	}
+	cout<<endl;
+}
+
+bool isBipartite(pair<list<int>*,int> adj) {
+	
+	int col[adj.second];
+	for(int i=0;i<adj.second;++i) {
+		col[i]=-1;
+	}
+	int src=0;
+	col[src]=0;// 0->red 1->blue
+	
+	//Can add a condition to return false is the vertex has a self loop.
+	
+	queue<int> q;
+	q.push(src);
+	
+	while(!q.empty()) {
+		
+		src=q.front();
+		q.pop();
+		
+		for(auto it=adj.first[src].begin();it!=adj.first[src].end();++it) {
+			
+			if(col[*it]==-1) {
+				col[*it]=1-col[src];
+				q.push(*it);
+			}
+			else if(col[*it]==col[src]) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 int main(int argc,char** argv) {
 	
 	pair<list<int>*,int> G1=createGraph<int>(4);
@@ -266,7 +357,7 @@ int main(int argc,char** argv) {
 	else
 		cout<<"No cycle!"<<endl;
 	
-	pair<list<int>*,int> G4=createGraph<int>(6);
+	pair<list<int>*,int> G4=createGraph<int>(6);//Unweighted DAG
 	
 	insert(G4,5,2);
 	insert(G4,5,0);
@@ -277,5 +368,52 @@ int main(int argc,char** argv) {
 	
 	printTopologicalSort(G4);
 	
+	pair<list<pair<int,float>>*,int> G5=createWeightedGraph(6);
+	
+	weightedInsert(G5,0,1,(float)5);
+	weightedInsert(G5,0,2,(float)3);
+	weightedInsert(G5,1,3,(float)6);
+	weightedInsert(G5,1,2,(float)2);
+	weightedInsert(G5,2,4,(float)4);
+	weightedInsert(G5,2,5,(float)2);
+	weightedInsert(G5,2,3,(float)7);
+	weightedInsert(G5,3,5,(float)1);
+	weightedInsert(G5,3,4,(float)-1);
+	weightedInsert(G5,4,5,(float)-2);
+	
+	int s=1;
+	cout << "Following are longest distances from source vertex "<< s << " \n";
+	printLongestPathDistances(G5,s);
+	
+	//Problem 11
+	//	|
+	//	|
+	//	v
+
+	pair<list<int>*,int> G6=createGraph<int>(4);//Unweighted DAG
+	
+	insert(G6,0,1);
+	insert(G6,0,3);
+	insert(G6,1,0);
+	insert(G6,1,2);
+	insert(G6,2,1);
+	insert(G6,2,3);
+	insert(G6,3,0);
+	insert(G6,3,2);
+
+	if(isBipartite(G6)) {
+		cout<<"G4 is Bipartite!"<<endl;
+	}
+	else
+		cout<<"G4 is not Bipartite"<<endl;
+	
 	return 0;
+	
+	//Problem 12
+	//	|
+	//	|
+	//	v
+	
+	
+	
 }
