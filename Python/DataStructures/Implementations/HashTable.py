@@ -31,6 +31,15 @@ class HashTable:
         h=self.getHash(val)%(self.capacity)
         self.container[h].append(val)
     
+    def isPresent(self,val):
+        h=self.getHash(val)%(self.capacity)
+        temp=self.container[h].head
+        while temp:
+            if temp.data==val:
+                return True
+            temp=temp.next
+        return False
+    
     def printHashTable(self):
         for i in range(len(self.container)):
             print("Key:",i,end=" : ")
@@ -43,3 +52,5 @@ h.insert(7)
 h.insert(15)
 h.insert(23)
 h.printHashTable()
+print(h.isPresent(5))
+print(h.isPresent(25))
