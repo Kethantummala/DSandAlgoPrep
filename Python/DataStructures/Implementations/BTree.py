@@ -97,7 +97,7 @@ class BinaryTree:
         while len(s)!=0:
             print(s.pop())
     
-    def getHeight(self,h=0):
+    def getHeight(self,h=1):
         h1=0
         h2=0
         if self.root.left:
@@ -106,7 +106,7 @@ class BinaryTree:
             h2=self.root.right.getHeight(h+1)
         return max(h,h1,h2)
     
-    def getDeepest(self,d=1):
+    def getDeepest(self,d=0):
         d1=0
         d2=0
         v1=0
